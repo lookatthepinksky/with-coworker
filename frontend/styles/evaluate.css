@@ -1,0 +1,218 @@
+.evaluate-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.evaluate-top {
+  margin-bottom: 36px;
+}
+
+.btn-back {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  transition: color 0.2s;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.btn-back:hover {
+  color: var(--primary);
+}
+
+.evaluate-target {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.evaluate-avatar {
+  width: 56px;
+  height: 56px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 1.3rem;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.evaluate-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.evaluate-desc {
+  font-size: 0.88rem;
+  color: var(--text-sub);
+}
+
+/* 평가 항목 카드 */
+.evaluate-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.evaluate-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: border-color 0.2s;
+}
+
+.evaluate-card:has(.score-btn.active) {
+  border-color: var(--primary);
+}
+
+.evaluate-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.evaluate-item-label {
+  font-size: 0.97rem;
+  font-weight: 700;
+}
+
+.evaluate-item-desc {
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+/* 숫자 버튼 */
+.score-buttons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.score-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.score-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.score-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* 코멘트 */
+.evaluate-comment {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.evaluate-comment label {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.optional {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  font-weight: 400;
+}
+
+.evaluate-comment textarea {
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  resize: none;
+  height: 110px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  width: 100%;
+}
+
+.evaluate-comment textarea::placeholder {
+  color: #C4C4D4;
+}
+
+.evaluate-comment textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 111, 247, 0.12);
+}
+
+/* 제출 버튼 */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--border);
+  color: var(--text-sub);
+}
+
+.btn-submit.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(124, 111, 247, 0.35);
+}
+
+.btn-submit.active:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* 완료 화면 */
+.evaluate-done {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.done-emoji {
+  font-size: 4rem;
+}
+
+.evaluate-done h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.evaluate-done p {
+  color: var(--text-sub);
+  font-size: 0.92rem;
+}

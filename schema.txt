@@ -1,0 +1,65 @@
+-- users
+CREATE TABLE users (
+    user_id   BIGSERIAL    PRIMARY KEY,
+    google_id VARCHAR(100) NOT NULL UNIQUE,
+    email     VARCHAR(100) NOT NULL UNIQUE,
+    name      VARCHAR(50)  NOT NULL,
+    created_at TIMESTAMP   DEFAULT NOW()
+);
+
+-- teams
+CREATE TABLE teams (
+    team_id BIGSERIAL   PRIMARY KEY,
+    name    VARCHAR(50) NOT NULL
+);
+
+-- team_members
+CREATE TABLE team_members (
+    team_member_id BIGSERIAL PRIMARY KEY,
+    team_id        BIGINT NOT NULL REFERENCES teams(team_id),
+    user_id        BIGINT NOT NULL REFERENCES users(user_id),
+    UNIQUE (team_id, user_id)
+);
+
+-- evaluation_items
+CREATE TABLE evaluation_items (
+    item_id BIGSERIAL    PRIMARY KEY,
+    label   VARCHAR(100) NOT NULL
+);
+
+-- evaluations
+CREATE TABLE evaluations (
+    evaluation_id BIGSERIAL   PRIMARY KEY,
+    evaluator_id  BIGINT      NOT NULL REFERENCES users(user_id),
+    evaluatee_id  BIGINT      NOT NULL REFERENCES users(user_id),
+    comment       TEXT,
+    created_at    TIMESTAMP   DEFAULT NOW()
+);
+
+-- evaluation_scores
+CREATE TABLE evaluation_scores (
+    score_id      BIGSERIAL PRIMARY KEY,
+    evaluation_id BIGINT    NOT NULL REFERENCES evaluations(evaluation_id),
+    item_id       BIGINT    NOT NULL REFERENCES evaluation_items(item_id),
+    score         INT       NOT NULL CHECK (score >= 1 AND score <= 5)
+);
+
+-- teams
+CREATE TABLE teams (
+    team_id BIGSERIAL   PRIMARY KEY,
+    name    VARCHAR(50) NOT NULL
+);
+
+-- team_members
+CREATE TABLE team_members (
+    team_member_id BIGSERIAL PRIMARY KEY,
+    team_id        BIGINT NOT NULL REFERENCES teams(team_id),
+    user_id        BIGINT NOT NULL REFERENCES users(user_id),
+    UNIQUE (team_id, user_id)
+);
+
+-- 팀 초기 데이터
+INSERT INTO teams (name) VALUES
+    ('개발1팀'),
+    ('개발2팀'),
+    ('개발3팀');

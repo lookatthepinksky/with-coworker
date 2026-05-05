@@ -1,0 +1,146 @@
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F0EFFE 0%, #FAFAFE 100%);
+  padding: 24px;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  box-shadow: 0 8px 32px rgba(124, 111, 247, 0.1);
+}
+
+.signup-logo {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 32px;
+}
+
+.signup-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.signup-desc {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  margin-bottom: 32px;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.signup-btn {
+  margin-top: 8px;
+  padding: 13px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(124, 111, 247, 0.35);
+}
+
+.signup-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.signup-footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.signup-footer a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.input-row input {
+  flex: 1;
+}
+
+.btn-send,
+.btn-verify {
+  flex-shrink: 0;
+  padding: 0 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: #f0effe;
+  border: 1.5px solid var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-send:hover:not(:disabled),
+.btn-verify:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-send:disabled,
+.btn-verify:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.verified-msg {
+  font-size: 0.85rem;
+  color: #22c55e;
+  font-weight: 600;
+  margin: -8px 0;
+}
+
+.error-msg {
+  font-size: 0.85rem;
+  color: #ef4444;
+  font-weight: 500;
+  margin: -8px 0;
+}
+
+.timer {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin-left: 8px;
+}
+
+.timer-warn {
+  color: #f97316;
+}
+
+.timer-expired {
+  color: #ef4444;
+}

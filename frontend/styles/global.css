@@ -1,0 +1,51 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #7C6FF7;
+  --primary-dark: #5F56D6;
+  --primary-light: #F0EFFE;
+  --accent: #60D4B0;
+  --accent-light: #E6FAF5;
+  --text: #2D2D2D;
+  --text-sub: #8A8A9A;
+  --border: #EBEBF5;
+  --bg: #FAFAFE;
+  --bg-card: #FFFFFF;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 4px 20px rgba(124, 111, 247, 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 0.4rem;
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
