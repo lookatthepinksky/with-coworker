@@ -38,3 +38,10 @@ out/
 
 ### Secrets ###
 application-local.properties
+
+### Node ###
+node_modules/
+target/
+.claude/
+F.png
+schema.txt
