@@ -5,7 +5,7 @@ import '@styles/signup.css'
 const EXPIRE_SECONDS = 5 * 60
 
 function Signup() {
-  const [form, setForm] = useState({ name: '', username: '', email: '', password: '', passwordConfirm: '' })
+  const [form, setForm] = useState({ name: '', loginId: '', email: '', password: '', passwordConfirm: '' })
   const [emailCode, setEmailCode] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [emailVerified, setEmailVerified] = useState(false)
@@ -97,7 +97,7 @@ function Signup() {
     try {
       await api.post('/api/auth/signup', {
         name: form.name,
-        username: form.username,
+        loginId: form.loginId,
         email: form.email,
         password: form.password,
       })
@@ -122,7 +122,7 @@ function Signup() {
 
           <div className="form-group">
             <label>아이디</label>
-            <input type="text" name="username" placeholder="아이디를 입력하세요 (4~20자)" value={form.username} onChange={handleChange} required />
+            <input type="text" name="loginId" placeholder="아이디를 입력하세요 (4~20자)" value={form.loginId} onChange={handleChange} required />
           </div>
 
           <div className="form-group">

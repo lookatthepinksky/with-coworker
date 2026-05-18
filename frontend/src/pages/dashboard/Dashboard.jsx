@@ -6,13 +6,19 @@ import '@styles/dashboard.css'
 
 function Dashboard() {
   const navigate = useNavigate()
-  const [animated, setAnimated] = useState(false)
   const [userName, setUserName] = useState('')
   const [teamName, setTeamName] = useState('')
   const [teammates, setTeammates] = useState([])
-  const [myScores, setMyScores] = useState([])
   const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+    if (token) {
+      localStorage.setItem('token', token)
+      window.history.replaceState({}, '', '/dashboard')
+    }
+  }, [])
 
   useEffect(() => {
     api.get('/api/dashboard')
@@ -20,9 +26,7 @@ function Dashboard() {
         setUserName(data.userName || '')
         setTeamName(data.teamName || '')
         setTeammates(data.teammates)
-        setMyScores(data.myScores)
         setLoading(false)
-        setTimeout(() => setAnimated(true), 100)
       })
       .catch((err) => {
         if (err.response?.status === 401 || err.response?.status === 403) {
@@ -37,8 +41,13 @@ function Dashboard() {
 
   return (
     <>
-      <DashboardHeader userName={userName} />
+      <DashboardHeader />
       <main className="dashboard-main">
+
+        <div className="page-nav">
+          <a href="/dashboard" className="page-nav-btn active">팀원 평가</a>
+          <a href="/result" className="page-nav-btn">내 평가</a>
+        </div>
 
         <div className="dashboard-greeting">
           {teamName && <span className="team-badge">🏷️ {teamName}</span>}
@@ -46,22 +55,24 @@ function Dashboard() {
           <p>이번 달 팀원 평가를 완료해주세요</p>
         </div>
 
-        <div className="dashboard-stats">
-          <div className="stat-card">
-            <span className="stat-card-label">전체 팀원</span>
-            <span className="stat-card-value">{teammates.length}명</span>
-          </div>
-          <div className="stat-card accent">
-            <span className="stat-card-label">평가 완료</span>
-            <span className="stat-card-value">{doneCount}명</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-card-label">남은 평가</span>
-            <span className="stat-card-value">{teammates.length - doneCount}명</span>
-          </div>
-        </div>
+        <div className="dashboard-block">
+          <h2 className="block-title">내가 한 평가</h2>
 
-        <div className="dashboard-content">
+          <div className="dashboard-stats">
+            <div className="stat-card">
+              <span className="stat-card-label">전체 팀원</span>
+              <span className="stat-card-value">{teammates.length}명</span>
+            </div>
+            <div className="stat-card accent">
+              <span className="stat-card-label">평가 완료</span>
+              <span className="stat-card-value">{doneCount}명</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-card-label">남은 평가</span>
+              <span className="stat-card-value">{teammates.length - doneCount}명</span>
+            </div>
+          </div>
+
           <section className="dashboard-section">
             <h2 className="section-label">이번 달 팀원 평가</h2>
             <div className="teammate-list">
@@ -87,31 +98,8 @@ function Dashboard() {
               ))}
             </div>
           </section>
-
-          <section className="dashboard-section">
-            <h2 className="section-label">내 평가 결과 <span className="section-sub">누적</span></h2>
-            {myScores.length === 0 ? (
-              <p className="no-result">아직 받은 평가가 없어요</p>
-            ) : (
-              <>
-                <div className="score-list">
-                  {myScores.map((s) => (
-                    <div className="score-item" key={s.label}>
-                      <div className="score-top">
-                        <span className="score-label">{s.label}</span>
-                        <span className="score-value">{s.score}</span>
-                      </div>
-                      <div className="score-bar-bg">
-                        <div className="score-bar-fill" style={{ width: animated ? `${(s.score / 5) * 100}%` : '0%' }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <a href="/result" className="btn-result">자세히 보기 →</a>
-              </>
-            )}
-          </section>
         </div>
+
 
       </main>
     </>

@@ -17,7 +17,7 @@ function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        © 2026 WithCoworker — made with ☕ & 🍕
+        © 2026 WithCoworker by Kim Sugeyong. All rights reserved.
       </div>
     </footer>
   )

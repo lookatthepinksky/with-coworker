@@ -1,13 +1,12 @@
 import api from '@api/client'
+import { useUser } from '@context/UserContext.jsx'
 import '@styles/dashboard-header.css'
 
-function DashboardHeader({ userName }) {
-  const handleLogout = async () => {
-    try {
-      await api.post('/logout')
-    } catch {
-      // Spring Security가 302를 응답해 인터셉터에서 에러로 처리될 수 있음 — 무시하고 홈으로 이동
-    }
+function DashboardHeader() {
+  const { userName } = useUser()
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
     window.location.href = '/'
   }
 
@@ -22,9 +21,9 @@ function DashboardHeader({ userName }) {
       <div className="dashboard-header-inner">
         <a href="/" className="logo">🧑‍💻 WithCoworker</a>
         <div className="dashboard-user">
-          <span className="user-name">{userName || '...'}</span>
+          <span className="user-name">{userName || '...'}님, 반갑습니다.</span>
           <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
-          <button className="btn-withdraw" onClick={handleDeleteAccount}>탈퇴</button>
+          {/* <button className="btn-withdraw" onClick={handleDeleteAccount}>탈퇴</button> */}
         </div>
       </div>
     </header>

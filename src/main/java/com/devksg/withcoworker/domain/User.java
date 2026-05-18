@@ -18,22 +18,19 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "google_id", nullable = false, unique = true)
-    private String googleId;
-
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String email;
 
     @Column(nullable = false)
     private String name;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Builder
-    public User(String googleId, String email, String name) {
-        this.googleId = googleId;
+    public User(String email, String name) {
         this.email = email;
         this.name = name;
+        this.createdAt = LocalDateTime.now();
     }
 }

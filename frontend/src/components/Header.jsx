@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react'
 import api from '@api/client'
+import { useUser } from '@context/UserContext.jsx'
 import '@styles/header.css'
 
 function Header() {
-  const [loggedIn, setLoggedIn] = useState(false)
+  const { loggedIn } = useUser()
 
-  useEffect(() => {
-    api.get('/api/user/me')
-      .then(({ data }) => setLoggedIn(!!data.loggedIn))
-      .catch(() => setLoggedIn(false))
-  }, [])
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    window.location.href = '/'
+  }
 
   return (
     <header className="header">
@@ -24,7 +23,11 @@ function Header() {
         </nav>
         <div className="header-actions">
           {loggedIn ? (
-            <a href="/dashboard" className="btn-signup">대시보드 →</a>
+            <>
+              <a href="/dashboard" className="btn-header">팀원 평가</a>
+              <a href="/result" className="btn-header">내 평가</a>
+              <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
+            </>
           ) : (
             <a href="/login" className="btn-signup">로그인</a>
           )}

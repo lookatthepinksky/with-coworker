@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -28,13 +29,17 @@ public class Evaluation {
 
     private String comment;
 
+    @Column(name = "target_month", nullable = false)
+    private LocalDate targetMonth;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public Evaluation(User evaluator, User evaluatee, String comment) {
+    public Evaluation(User evaluator, User evaluatee, String comment, LocalDate targetMonth) {
         this.evaluator = evaluator;
         this.evaluatee = evaluatee;
         this.comment = comment;
+        this.targetMonth = targetMonth;
     }
 }

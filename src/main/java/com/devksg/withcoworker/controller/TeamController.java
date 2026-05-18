@@ -1,10 +1,10 @@
 package com.devksg.withcoworker.controller;
 
+import com.devksg.withcoworker.domain.User;
 import com.devksg.withcoworker.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +24,8 @@ public class TeamController {
 
     @PostMapping("/{teamId}/join")
     public ResponseEntity<Void> joinTeam(@PathVariable Long teamId,
-                                         @AuthenticationPrincipal OAuth2User oAuth2User) {
-        teamService.joinTeam(teamId, oAuth2User.getAttribute("sub"));
+                                         @AuthenticationPrincipal User user) {
+        teamService.joinTeam(teamId, user.getId());
         return ResponseEntity.ok().build();
     }
 }

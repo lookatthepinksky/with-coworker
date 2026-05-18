@@ -36,6 +36,37 @@ a {
   color: inherit;
 }
 
+/* 페이지 간 네비 탭 */
+.page-nav {
+  display: flex;
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  padding: 5px;
+  width: fit-content;
+  margin-bottom: 32px;
+}
+
+.page-nav-btn {
+  padding: 8px 24px;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  transition: all 0.2s;
+}
+
+.page-nav-btn:hover {
+  color: var(--primary);
+}
+
+.page-nav-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 111, 247, 0.3);
+}
+
 .section-title {
   font-size: 1.75rem;
   font-weight: 800;

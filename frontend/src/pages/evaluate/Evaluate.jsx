@@ -1,44 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import api from '@api/client'
 import DashboardHeader from '@pages/dashboard/components/DashboardHeader.jsx'
 import '@styles/evaluate.css'
 
-const teammates = [
-  { id: '1', name: '이병헌' },
-  { id: '2', name: '송강호' },
-  { id: '3', name: '전지현' },
-  { id: '4', name: '공유' },
-  { id: '5', name: '박보검' },
-]
-
-const items = [
-  { key: 'communication', label: '🗣️ 의사소통', desc: '의견을 명확하게 전달하고 경청하나요?' },
-  { key: 'knowledge', label: '📚 지식공유', desc: '알고 있는 것을 팀원과 잘 공유하나요?' },
-  { key: 'proactive', label: '🙋 적극성', desc: '먼저 나서고 주도적으로 행동하나요?' },
-  { key: 'problem', label: '🔧 문제해결', desc: '문제 상황에서 해결책을 잘 찾나요?' },
-  { key: 'deadline', label: '⏱️ 일정 준수', desc: '마감을 잘 지키나요?' },
-  { key: 'accuracy', label: '🎯 정확성', desc: '실수 없이 꼼꼼하게 작업하나요?' },
-]
-
 function Evaluate() {
   const { id } = useParams()
-  const teammate = teammates.find((t) => t.id === id)
+  const [name, setName] = useState('')
+  const [items, setItems] = useState([])
   const [scores, setScores] = useState({})
   const [comment, setComment] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleScore = (key, value) => {
-    setScores((prev) => ({ ...prev, [key]: value }))
+  useEffect(() => {
+    api.get(`/api/evaluate/${id}`).then(({ data }) => setName(data.name))
+    api.get('/api/evaluation-items').then(({ data }) => setItems(data))
+  }, [id])
+
+  const handleScore = (itemId, value) => {
+    setScores((prev) => ({ ...prev, [itemId]: value }))
   }
 
-  const isAllScored = items.every((item) => scores[item.key])
+  const isAllScored = items.length > 0 && items.every((item) => scores[item.id]) && comment.trim().length > 0
 
-  const handleSubmit = () => {
-    if (!isAllScored) return
-    setSubmitted(true)
-    setTimeout(() => {
-      window.location.href = '/dashboard'
-    }, 1500)
+  const handleSubmit = async () => {
+    if (!isAllScored || submitting) return
+    setSubmitting(true)
+    try {
+      await api.post('/api/evaluations', {
+        evaluateeId: Number(id),
+        comment,
+        scores: items.map((item) => ({ itemId: item.id, score: scores[item.id] })),
+      })
+      setSubmitted(true)
+      setTimeout(() => { window.location.href = '/dashboard' }, 1500)
+    } catch {
+      setSubmitting(false)
+    }
   }
 
   if (submitted) {
@@ -46,7 +45,7 @@ function Evaluate() {
       <div className="evaluate-done">
         <span className="done-emoji">🎉</span>
         <h2>평가 완료!</h2>
-        <p>대시보드로 돌아갈게요...</p>
+        <p>팀원 평가로 돌아갈게요...</p>
       </div>
     )
   }
@@ -57,11 +56,11 @@ function Evaluate() {
       <main className="evaluate-main">
 
         <div className="evaluate-top">
-          <a href="/dashboard" className="btn-back">← 대시보드로</a>
+          <a href="/dashboard" className="btn-back">← 팀원 평가로</a>
           <div className="evaluate-target">
-            <span className="evaluate-avatar">{teammate?.name[0]}</span>
+            <span className="evaluate-avatar">{name ? name[0] : ''}</span>
             <div>
-              <h1 className="evaluate-title">{teammate?.name}님 평가하기</h1>
+              <h1 className="evaluate-title">{name}님 평가하기</h1>
               <p className="evaluate-desc">항목별로 1~5점을 선택해주세요</p>
             </div>
           </div>
@@ -69,30 +68,30 @@ function Evaluate() {
 
         <div className="evaluate-items">
           {items.map((item) => (
-            <div className="evaluate-card" key={item.key}>
-              <div className="evaluate-item-info">
-                <span className="evaluate-item-label">{item.label}</span>
-                <span className="evaluate-item-desc">{item.desc}</span>
+              <div className="evaluate-card" key={item.id}>
+                <div className="evaluate-item-info">
+                  <span className="evaluate-item-label">{item.label}</span>
+                  <span className="evaluate-item-desc">{item.description}</span>
+                </div>
+                <div className="score-buttons">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      className={`score-btn ${scores[item.id] === num ? 'active' : ''}`}
+                      onClick={() => handleScore(item.id, num)}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="score-buttons">
-                {[1, 2, 3, 4, 5].map((num) => (
-                  <button
-                    key={num}
-                    className={`score-btn ${scores[item.key] === num ? 'active' : ''}`}
-                    onClick={() => handleScore(item.key, num)}
-                  >
-                    {num}
-                  </button>
-                ))}
-              </div>
-            </div>
           ))}
         </div>
 
         <div className="evaluate-comment">
-          <label>💬 한마디 남기기 <span className="optional">(선택)</span></label>
+          <label>💬 한마디 남기기 <span className="required">*</span></label>
           <textarea
-            placeholder="익명으로 전달돼요. 솔직하게 써도 괜찮아요 😊"
+            placeholder="건설적인 피드백은 팀 전체를 성장시켜요 ✍️"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
@@ -101,9 +100,15 @@ function Evaluate() {
         <button
           className={`btn-submit ${isAllScored ? 'active' : ''}`}
           onClick={handleSubmit}
-          disabled={!isAllScored}
+          disabled={!isAllScored || submitting}
         >
-          {isAllScored ? '평가 제출하기 🚀' : `${items.length - Object.keys(scores).length}개 항목이 남았어요`}
+          {submitting
+            ? '제출 중...'
+            : isAllScored
+              ? '평가 제출하기 🚀'
+              : items.length - Object.keys(scores).length > 0
+                ? `${items.length - Object.keys(scores).length}개 항목이 남았어요`
+                : '한마디를 남겨주세요'}
         </button>
 
       </main>

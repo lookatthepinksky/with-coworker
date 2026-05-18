@@ -28,8 +28,8 @@ public class TeamService {
     }
 
     @Transactional
-    public void joinTeam(Long teamId, String googleId) {
-        User user = userRepository.findByGoogleId(googleId).orElseThrow();
+    public void joinTeam(Long teamId, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
 

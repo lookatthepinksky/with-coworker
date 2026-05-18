@@ -17,4 +17,7 @@ public class EvaluationItem {
 
     @Column(nullable = false)
     private String label;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 }

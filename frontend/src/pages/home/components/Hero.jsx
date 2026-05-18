@@ -1,15 +1,8 @@
-import { useEffect, useState } from 'react'
-import api from '@api/client'
+import { useUser } from '@context/UserContext.jsx'
 import '@styles/hero.css'
 
 function Hero() {
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  useEffect(() => {
-    api.get('/api/user/me')
-      .then(({ data }) => setLoggedIn(!!data.loggedIn))
-      .catch(() => setLoggedIn(false))
-  }, [])
+  const { loggedIn } = useUser()
 
   return (
     <section className="hero">
@@ -26,7 +19,7 @@ function Hero() {
         </p>
         <div className="hero-buttons">
           {loggedIn ? (
-            <a href="/dashboard" className="btn-primary">대시보드로 이동 🚀</a>
+            <a href="/dashboard" className="btn-primary">팀원 평가 시작하기 🚀</a>
           ) : (
             <a href="/login" className="btn-primary">로그인하고 시작하기 🚀</a>
           )}

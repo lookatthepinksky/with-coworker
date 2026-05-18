@@ -1,6 +1,7 @@
 package com.devksg.withcoworker.domain;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,11 @@ public class EvaluationScore {
 
     @Column(nullable = false)
     private int score;
+
+    @Builder
+    public EvaluationScore(Evaluation evaluation, EvaluationItem item, int score) {
+        this.evaluation = evaluation;
+        this.item = item;
+        this.score = score;
+    }
 }
