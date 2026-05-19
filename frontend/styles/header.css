@@ -55,23 +55,6 @@
   flex-shrink: 0;
 }
 
-.btn-login {
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--primary);
-  border: 1.5px solid var(--border);
-  border-radius: 50px;
-  background: #fff;
-  white-space: nowrap;
-  transition: border-color 0.2s;
-}
-
-.btn-login:hover {
-  border-color: var(--primary);
-}
 
 .btn-signup {
   display: inline-flex;

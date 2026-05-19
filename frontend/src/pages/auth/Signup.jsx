@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '@api/client'
-import '@styles/signup.css'
 
 const EXPIRE_SECONDS = 5 * 60
 

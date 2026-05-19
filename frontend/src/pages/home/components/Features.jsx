@@ -1,4 +1,3 @@
-import '@styles/features.css'
 
 const features = [
   {

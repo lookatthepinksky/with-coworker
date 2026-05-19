@@ -19,10 +19,10 @@ function DashboardHeader() {
   return (
     <header className="dashboard-header">
       <div className="dashboard-header-inner">
-        <a href="/" className="logo">🧑‍💻 WithCoworker</a>
+        <a href="/" className="dashboard-logo">🧑‍💻 WithCoworker</a>
         <div className="dashboard-user">
           <span className="user-name">{userName || '...'}님, 반갑습니다.</span>
-          <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
+          <button className="dashboard-btn-logout" onClick={handleLogout}>로그아웃</button>
           {/* <button className="btn-withdraw" onClick={handleDeleteAccount}>탈퇴</button> */}
         </div>
       </div>

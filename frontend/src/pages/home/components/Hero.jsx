@@ -1,5 +1,4 @@
 import { useUser } from '@context/UserContext.jsx'
-import '@styles/hero.css'
 
 function Hero() {
   const { loggedIn } = useUser()

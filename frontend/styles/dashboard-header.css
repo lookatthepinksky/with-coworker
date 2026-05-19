@@ -17,7 +17,7 @@
   justify-content: space-between;
 }
 
-.logo {
+.dashboard-logo {
   font-size: 1rem;
   font-weight: 800;
   color: var(--primary);
@@ -35,7 +35,7 @@
   color: var(--text);
 }
 
-.btn-logout {
+.dashboard-btn-logout {
   padding: 6px 14px;
   font-size: 0.82rem;
   font-weight: 600;
@@ -47,7 +47,7 @@
   transition: border-color 0.2s, color 0.2s;
 }
 
-.btn-logout:hover {
+.dashboard-btn-logout:hover {
   border-color: var(--primary);
   color: var(--primary);
 }

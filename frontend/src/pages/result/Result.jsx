@@ -122,7 +122,7 @@ function Result() {
         <section className="result-section chart-section">
           <div className="chart-header">
             <div>
-              <h2 className="section-label">점수 변화 추이</h2>
+              <h2 className="result-section-label">점수 변화 추이</h2>
               <p className="section-sub-desc">
                 {activeTab === '1m' ? '항목별 점수예요' : '항목별 월평균 점수예요'}
               </p>
@@ -186,7 +186,7 @@ function Result() {
 
         <div className="result-content">
           <section className="result-section">
-            <h2 className="section-label">항목별 점수</h2>
+            <h2 className="result-section-label">항목별 점수</h2>
             <p className="section-sub-desc">현재 vs 이전 기간 비교예요</p>
             {summaryLoading ? (
               <div className="no-result">불러오는 중...</div>
@@ -229,7 +229,7 @@ function Result() {
           </section>
 
           <section className="result-section">
-            <h2 className="section-label">팀원 코멘트</h2>
+            <h2 className="result-section-label">팀원 코멘트</h2>
             <p className="section-sub-desc">월별로 펼쳐서 볼 수 있어요</p>
             {summaryLoading ? (
               <div className="no-result">불러오는 중...</div>

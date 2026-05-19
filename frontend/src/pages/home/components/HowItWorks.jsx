@@ -1,4 +1,3 @@
-import '@styles/howitworks.css'
 
 const steps = [
   { step: '01', title: '로그인해요', desc: '구글 계정으로 로그인하면 바로 시작할 수 있어요.' },

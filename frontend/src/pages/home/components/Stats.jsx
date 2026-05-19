@@ -1,4 +1,3 @@
-import '@styles/stats.css'
 
 const stats = [
   { value: '12,400+', label: '누적 회원' },

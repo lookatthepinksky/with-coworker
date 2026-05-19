@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@api/client'
-import '@styles/team-select.css'
 
 function TeamSelect() {
   const [teams, setTeams] = useState([])
