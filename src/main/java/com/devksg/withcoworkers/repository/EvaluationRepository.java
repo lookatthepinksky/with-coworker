@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     boolean existsByEvaluatorAndEvaluateeAndTargetMonth(
         User evaluator, User evaluatee, LocalDate targetMonth);
@@ -49,4 +50,17 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
         @Param("startMonth") LocalDate startMonth,
         @Param("endMonth") LocalDate endMonth
     );
+
+    @Query("""
+        SELECT DISTINCT tm.user FROM TeamMember tm
+        WHERE (
+            SELECT COUNT(e) FROM Evaluation e
+            WHERE e.evaluator = tm.user
+            AND e.targetMonth = :targetMonth
+        ) < (
+            SELECT COUNT(tm2) FROM TeamMember tm2
+            WHERE tm2.team = tm.team
+        ) - 1
+    """)
+    List<User> findIncompleteEvaluators(@Param("targetMonth") LocalDate targetMonth);
 }

@@ -9,6 +9,7 @@ import com.devksg.withcoworker.dto.SignupRequest;
 import com.devksg.withcoworker.repository.AuthProviderRepository;
 import com.devksg.withcoworker.repository.TeamMemberRepository;
 import com.devksg.withcoworker.repository.UserRepository;
+import com.devksg.withcoworker.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,7 @@ public class AuthController {
     private final TeamMemberRepository teamMemberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final UserSessionService userSessionService;
 
     @PostMapping("/login")
     @Transactional
@@ -38,6 +40,7 @@ public class AuthController {
             .map(ap -> {
                 User user = ap.getUser();
                 String token = jwtTokenProvider.generateToken(user.getId());
+                userSessionService.save(user.getId(), token);
                 boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
                 String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
                 return ResponseEntity.ok(Map.of("token", token, "redirectPath", redirectPath));

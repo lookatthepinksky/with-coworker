@@ -1,4 +1,4 @@
-package com.devksg.withcoworker;
+package com.devksg.withcoworkers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

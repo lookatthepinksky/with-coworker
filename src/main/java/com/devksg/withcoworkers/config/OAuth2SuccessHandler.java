@@ -4,6 +4,7 @@ import com.devksg.withcoworker.domain.ProviderType;
 import com.devksg.withcoworker.domain.User;
 import com.devksg.withcoworker.repository.AuthProviderRepository;
 import com.devksg.withcoworker.repository.TeamMemberRepository;
+import com.devksg.withcoworker.service.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final AuthProviderRepository authProviderRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserSessionService userSessionService;
 
     @Override
     @Transactional
@@ -37,6 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         User user = authProvider.getUser();
         String token = jwtTokenProvider.generateToken(user.getId());
+        userSessionService.save(user.getId(), token);
         boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
         String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
 

@@ -1,4 +1,4 @@
-package com.devksg.withcoworker;
+package com.devksg.withcoworkers;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
