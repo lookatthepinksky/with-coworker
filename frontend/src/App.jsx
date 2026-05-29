@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { UserProvider, useUser } from './context/UserContext.jsx'
+import { isHandling401 } from './api/client.js'
 import Home from './pages/home/Home.jsx'
 import Login from './pages/auth/Login.jsx'
 import Signup from './pages/auth/Signup.jsx'
@@ -15,7 +16,9 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (!loading && !loggedIn) {
-      alert('로그인이 필요한 서비스입니다.')
+      if (!isHandling401) {
+        alert('로그인이 필요한 서비스입니다.')
+      }
       navigate('/login', { replace: true })
     }
   }, [loading, loggedIn, navigate])

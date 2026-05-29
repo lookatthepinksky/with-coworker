@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.dto;
+package com.devksg.withcoworkers.dto;
 
 import lombok.Getter;
 import lombok.Setter;

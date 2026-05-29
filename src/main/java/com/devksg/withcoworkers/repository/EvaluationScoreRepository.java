@@ -1,6 +1,6 @@
-package com.devksg.withcoworker.repository;
+package com.devksg.withcoworkers.repository;
 
-import com.devksg.withcoworker.domain.EvaluationScore;
+import com.devksg.withcoworkers.domain.EvaluationScore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

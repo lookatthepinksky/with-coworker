@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts'
 import DashboardHeader from '@pages/dashboard/components/DashboardHeader.jsx'
 import api from '@api/client'
@@ -187,44 +188,31 @@ function Result() {
         <div className="result-content">
           <section className="result-section">
             <h2 className="result-section-label">항목별 점수</h2>
-            <p className="section-sub-desc">현재 vs 이전 기간 비교예요</p>
+            <p className="section-sub-desc">현재 vs 이전 기간 비교에요</p>
             {summaryLoading ? (
               <div className="no-result">불러오는 중...</div>
             ) : scores.length === 0 ? (
               <div className="no-result">해당 기간에 평가 데이터가 없어요</div>
             ) : (
-              <div className="score-list">
-                {scores.map((s) => {
-                  const diff = (s.current - s.prev).toFixed(1)
-                  const isUp = diff > 0
-                  const isSame = diff == 0
-                  return (
-                    <div className="score-item" key={s.label}>
-                      <div className="score-top">
-                        <span className="score-label">{s.label}</span>
-                        <div className="score-right">
-                          <span className={`score-diff ${isUp ? 'up' : isSame ? 'same' : 'down'}`}>
-                            {isSame ? '→' : isUp ? `▲ +${diff}` : `▼ ${diff}`}
-                          </span>
-                          <span className="score-value">{s.current}</span>
-                        </div>
-                      </div>
-                      <div className="bar-wrap">
-                        <div className="bar-bg">
-                          <div className="bar-fill" style={{ width: animated ? `${(s.current / 5) * 100}%` : '0%' }} />
-                        </div>
-                        <div className="bar-bg prev">
-                          <div className="bar-fill prev" style={{ width: animated ? `${(s.prev / 5) * 100}%` : '0%' }} />
-                        </div>
-                      </div>
-                      <div className="bar-legend">
-                        <span className="legend-current">● 현재 {s.current}</span>
-                        <span className="legend-prev">● 이전 {s.prev}</span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              <ResponsiveContainer width="100%" height={320}>
+                <RadarChart data={scores.map(s => ({ label: s.label, current: s.current, prev: s.prev }))}>
+                  <PolarGrid stroke="#E5E7EB" />
+                  <PolarAngleAxis dataKey="label" tick={{ fontSize: 12, fill: '#6B7280' }} />
+                  <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={{ fontSize: 10, fill: '#9CA3AF' }} />
+                  <Radar name="이전" dataKey="prev" stroke="#9CA3AF" fill="#9CA3AF" fillOpacity={0.2} strokeWidth={2} />
+                  <Radar name="현재" dataKey="current" stroke="#6D28D9" fill="#6D28D9" fillOpacity={0.3} strokeWidth={2} />
+                  <Legend
+                    wrapperStyle={{ paddingTop: 60, paddingLeft: 20 }}
+                    formatter={(value) => (
+                      <span style={{ fontSize: 13, color: value === '현재' ? '#6D28D9' : '#9CA3AF' }}>{value}</span>
+                    )}
+                  />
+                  <Tooltip
+                    contentStyle={{ border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: 13 }}
+                    formatter={(value, name) => [value, name]}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
             )}
           </section>
 

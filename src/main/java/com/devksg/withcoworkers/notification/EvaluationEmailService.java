@@ -1,7 +1,7 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
-import com.devksg.withcoworker.domain.NotificationHistory;
-import com.devksg.withcoworker.repository.NotificationHistoryRepository;
+import com.devksg.withcoworkers.domain.NotificationHistory;
+import com.devksg.withcoworkers.repository.NotificationHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

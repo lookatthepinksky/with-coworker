@@ -1,8 +1,8 @@
-package com.devksg.withcoworker.controller;
+package com.devksg.withcoworkers.controller;
 
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.dto.DashboardResponse;
-import com.devksg.withcoworker.service.DashboardService;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.dto.DashboardResponse;
+import com.devksg.withcoworkers.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
 /**
  * SQS 큐에 넣을 이메일 메시지 DTO

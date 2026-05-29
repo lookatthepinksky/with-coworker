@@ -1,15 +1,15 @@
-package com.devksg.withcoworker.controller;
+package com.devksg.withcoworkers.controller;
 
-import com.devksg.withcoworker.config.JwtTokenProvider;
-import com.devksg.withcoworker.domain.AuthProvider;
-import com.devksg.withcoworker.domain.ProviderType;
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.dto.LoginRequest;
-import com.devksg.withcoworker.dto.SignupRequest;
-import com.devksg.withcoworker.repository.AuthProviderRepository;
-import com.devksg.withcoworker.repository.TeamMemberRepository;
-import com.devksg.withcoworker.repository.UserRepository;
-import com.devksg.withcoworker.service.UserSessionService;
+import com.devksg.withcoworkers.config.JwtTokenProvider;
+import com.devksg.withcoworkers.domain.AuthProvider;
+import com.devksg.withcoworkers.domain.ProviderType;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.dto.LoginRequest;
+import com.devksg.withcoworkers.dto.SignupRequest;
+import com.devksg.withcoworkers.repository.AuthProviderRepository;
+import com.devksg.withcoworkers.repository.TeamMemberRepository;
+import com.devksg.withcoworkers.repository.UserRepository;
+import com.devksg.withcoworkers.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

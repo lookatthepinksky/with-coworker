@@ -89,7 +89,7 @@ function Evaluate() {
         </div>
 
         <div className="evaluate-comment">
-          <label>💬 한마디 남기기 <span className="required">*</span></label>
+          <label>💬 종합 의견 남기기 <span className="required">*</span></label>
           <textarea
             placeholder="건설적인 피드백은 팀 전체를 성장시켜요 ✍️"
             value={comment}

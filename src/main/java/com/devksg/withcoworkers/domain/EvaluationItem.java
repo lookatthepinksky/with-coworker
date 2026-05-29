@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.domain;
+package com.devksg.withcoworkers.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

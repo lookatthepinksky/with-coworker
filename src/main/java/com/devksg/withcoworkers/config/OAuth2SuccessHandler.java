@@ -1,10 +1,10 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
-import com.devksg.withcoworker.domain.ProviderType;
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.repository.AuthProviderRepository;
-import com.devksg.withcoworker.repository.TeamMemberRepository;
-import com.devksg.withcoworker.service.UserSessionService;
+import com.devksg.withcoworkers.domain.ProviderType;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.repository.AuthProviderRepository;
+import com.devksg.withcoworkers.repository.TeamMemberRepository;
+import com.devksg.withcoworkers.service.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

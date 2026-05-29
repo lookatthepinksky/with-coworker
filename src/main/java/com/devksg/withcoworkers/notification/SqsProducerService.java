@@ -1,6 +1,6 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
-import com.devksg.withcoworker.config.SqsProperties;
+import com.devksg.withcoworkers.config.SqsProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

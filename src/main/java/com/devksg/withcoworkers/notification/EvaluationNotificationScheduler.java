@@ -1,9 +1,9 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.repository.AuthProviderRepository;
-import com.devksg.withcoworker.repository.EvaluationRepository;
-import com.devksg.withcoworker.repository.UserRepository;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.repository.AuthProviderRepository;
+import com.devksg.withcoworkers.repository.EvaluationRepository;
+import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +23,7 @@ public class EvaluationNotificationScheduler {
     private final SqsProducerService sqsProducerService;
 
     // 매월 1일 오전 9시 - 평가 시작 안내
+
     @Scheduled(cron = "0 0 9 1 * *", zone = "Asia/Seoul")
     public void sendStartNotification() {
         sendNotifications(EmailNotificationType.START);

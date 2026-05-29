@@ -1,15 +1,15 @@
-package com.devksg.withcoworker.service;
+package com.devksg.withcoworkers.service;
 
-import com.devksg.withcoworker.domain.Evaluation;
-import com.devksg.withcoworker.domain.EvaluationItem;
-import com.devksg.withcoworker.domain.EvaluationScore;
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.dto.EvaluationRequest;
-import com.devksg.withcoworker.repository.EvaluationItemRepository;
-import com.devksg.withcoworker.repository.EvaluationRepository;
-import com.devksg.withcoworker.repository.EvaluationScoreRepository;
-import com.devksg.withcoworker.repository.TeamMemberRepository;
-import com.devksg.withcoworker.repository.UserRepository;
+import com.devksg.withcoworkers.domain.Evaluation;
+import com.devksg.withcoworkers.domain.EvaluationItem;
+import com.devksg.withcoworkers.domain.EvaluationScore;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.dto.EvaluationRequest;
+import com.devksg.withcoworkers.repository.EvaluationItemRepository;
+import com.devksg.withcoworkers.repository.EvaluationRepository;
+import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
+import com.devksg.withcoworkers.repository.TeamMemberRepository;
+import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

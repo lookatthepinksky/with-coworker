@@ -1,11 +1,11 @@
-package com.devksg.withcoworker.service;
+package com.devksg.withcoworkers.service;
 
-import com.devksg.withcoworker.domain.TeamMember;
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.dto.DashboardResponse;
-import com.devksg.withcoworker.repository.EvaluationRepository;
-import com.devksg.withcoworker.repository.EvaluationScoreRepository;
-import com.devksg.withcoworker.repository.TeamMemberRepository;
+import com.devksg.withcoworkers.domain.TeamMember;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.dto.DashboardResponse;
+import com.devksg.withcoworkers.repository.EvaluationRepository;
+import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
+import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

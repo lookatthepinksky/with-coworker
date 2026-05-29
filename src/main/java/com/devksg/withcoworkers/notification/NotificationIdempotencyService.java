@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

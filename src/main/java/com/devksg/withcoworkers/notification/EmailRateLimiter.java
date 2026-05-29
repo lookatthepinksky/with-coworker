@@ -1,6 +1,6 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
-import com.devksg.withcoworker.repository.NotificationHistoryRepository;
+import com.devksg.withcoworkers.repository.NotificationHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;

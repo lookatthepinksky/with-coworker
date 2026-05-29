@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

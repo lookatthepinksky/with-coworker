@@ -1,10 +1,10 @@
-package com.devksg.withcoworker.service;
+package com.devksg.withcoworkers.service;
 
-import com.devksg.withcoworker.domain.AuthProvider;
-import com.devksg.withcoworker.domain.ProviderType;
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.repository.AuthProviderRepository;
-import com.devksg.withcoworker.repository.UserRepository;
+import com.devksg.withcoworkers.domain.AuthProvider;
+import com.devksg.withcoworkers.domain.ProviderType;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.repository.AuthProviderRepository;
+import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

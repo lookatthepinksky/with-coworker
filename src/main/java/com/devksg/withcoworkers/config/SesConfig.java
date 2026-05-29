@@ -7,20 +7,20 @@ import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.SqsClientBuilder;
+import software.amazon.awssdk.services.ses.SesClient;
+import software.amazon.awssdk.services.ses.SesClientBuilder;
 
 import java.net.URI;
 
 @Configuration
 @RequiredArgsConstructor
-public class SqsConfig {
+public class SesConfig {
 
-    private final SqsProperties props;
+    private final SqsProperties props; // LocalStack endpoint/credentials 재사용 (동일 포트)
 
     @Bean
-    public SqsClient sqsClient() {
-        SqsClientBuilder builder = SqsClient.builder()
+    public SesClient sesClient() {
+        SesClientBuilder builder = SesClient.builder()
                 .region(Region.of(props.getRegion()))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(
@@ -28,7 +28,6 @@ public class SqsConfig {
                         )
                 );
 
-        // 로컬(LocalStack)일 때만 endpoint override 적용
         if (StringUtils.hasText(props.getEndpointOverride())) {
             builder.endpointOverride(URI.create(props.getEndpointOverride()));
         }

@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
 import lombok.Getter;
 import lombok.Setter;

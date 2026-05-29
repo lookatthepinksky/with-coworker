@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>com.devksg</groupId>
-  <artifactId>with-coworker</artifactId>
+  <artifactId>with-coworkers</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>with-coworker</name>
   <description>with-coworker</description>
@@ -103,10 +103,10 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Gmail SMTP -->
+    <!-- AWS SES SDK -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-mail</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>ses</artifactId>
     </dependency>
 
     <!-- AWS SDK v2 SQS -->

@@ -1,6 +1,6 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
-import com.devksg.withcoworker.service.OAuth2UserService;
+import com.devksg.withcoworkers.service.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/oauth2/**", "/login/**", "/api/auth/**").permitAll()
+                .requestMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/api/companies/search").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )

@@ -1,6 +1,6 @@
-package com.devksg.withcoworker.repository;
+package com.devksg.withcoworkers.repository;
 
-import com.devksg.withcoworker.domain.User;
+import com.devksg.withcoworkers.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

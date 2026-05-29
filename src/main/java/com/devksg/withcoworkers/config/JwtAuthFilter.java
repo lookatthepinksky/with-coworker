@@ -1,7 +1,7 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
-import com.devksg.withcoworker.repository.UserRepository;
-import com.devksg.withcoworker.service.UserSessionService;
+import com.devksg.withcoworkers.repository.UserRepository;
+import com.devksg.withcoworkers.service.UserSessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

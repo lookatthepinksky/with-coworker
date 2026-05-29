@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.notification;
+package com.devksg.withcoworkers.notification;
 
 public enum EmailNotificationType {
     START,    // 매월 1일 - 평가 시작 안내

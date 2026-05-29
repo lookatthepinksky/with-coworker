@@ -1,10 +1,10 @@
-package com.devksg.withcoworker.controller;
+package com.devksg.withcoworkers.controller;
 
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.dto.ResultSummaryResponse;
-import com.devksg.withcoworker.dto.ScoreTrendResponse;
-import com.devksg.withcoworker.repository.EvaluationRepository;
-import com.devksg.withcoworker.repository.EvaluationScoreRepository;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.dto.ResultSummaryResponse;
+import com.devksg.withcoworkers.dto.ScoreTrendResponse;
+import com.devksg.withcoworkers.repository.EvaluationRepository;
+import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

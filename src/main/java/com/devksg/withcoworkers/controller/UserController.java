@@ -1,7 +1,7 @@
-package com.devksg.withcoworker.controller;
+package com.devksg.withcoworkers.controller;
 
-import com.devksg.withcoworker.domain.User;
-import com.devksg.withcoworker.repository.UserRepository;
+import com.devksg.withcoworkers.domain.User;
+import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

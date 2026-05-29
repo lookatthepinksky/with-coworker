@@ -1,4 +1,4 @@
-package com.devksg.withcoworker.config;
+package com.devksg.withcoworkers.config;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
