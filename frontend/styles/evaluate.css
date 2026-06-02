@@ -135,6 +135,25 @@
 .evaluate-comment label {
   font-size: 0.92rem;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-count {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-sub);
+  margin-left: auto;
+}
+
+.comment-count.done {
+  color: var(--accent);
+}
+
+.comment-count.over {
+  color: #F87171;
+  font-weight: 700;
 }
 
 .optional {

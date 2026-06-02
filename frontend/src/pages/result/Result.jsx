@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts'
+import { pdf } from '@react-pdf/renderer'
+import html2canvas from 'html2canvas'
+import ResultPdfDocument from './ResultPdfDocument'
 import DashboardHeader from '@pages/dashboard/components/DashboardHeader.jsx'
 import api from '@api/client'
 import '@styles/result.css'
@@ -25,14 +28,33 @@ function Result() {
   const [summaryData, setSummaryData] = useState(null)
   const [summaryLoading, setSummaryLoading] = useState(true)
   const [trendData, setTrendData] = useState([])
+  const [latestEvaluatorCount, setLatestEvaluatorCount] = useState(null)
   const [trendLoading, setTrendLoading] = useState(true)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [chartReady, setChartReady] = useState(false)
+  const radarChartRef = useRef(null)
+  const trendChartRef = useRef(null)
+
+  useEffect(() => {
+    if (trendLoading || summaryLoading) {
+      setChartReady(false)
+    } else {
+      const timer = setTimeout(() => setChartReady(true), 500)
+      return () => clearTimeout(timer)
+    }
+  }, [trendLoading, summaryLoading])
+
+  useEffect(() => {
+    api.get('/api/result/latest-evaluator-count')
+      .then(({ data }) => setLatestEvaluatorCount(data.count))
+  }, [])
 
   useEffect(() => {
     setSummaryLoading(true)
     setTrendLoading(true)
     setAnimated(false)
     setOpenMonths({})
-    api.get(`/api/result/summary?tab=${activeTab}`)
+    api.get(`/api/result/summary?months=${TAB_MONTHS[activeTab]}`)
       .then(({ data }) => {
         setSummaryData(data)
         setTimeout(() => setAnimated(true), 100)
@@ -70,8 +92,58 @@ function Result() {
   }, {})
   const sortedMonths = Object.keys(commentsByMonth).sort((a, b) => b.localeCompare(a))
 
+  const exportPdf = async () => {
+    setPdfLoading(true)
+    try {
+      // 차트 이미지 캡처
+      const captureChart = async (ref) => {
+        if (!ref.current) return null
+        const canvas = await html2canvas(ref.current, {
+          scale: 2, backgroundColor: '#ffffff', logging: false,
+        })
+        return canvas.toDataURL('image/png')
+      }
+
+      const [trendChartImageUrl, radarChartImageUrl] = await Promise.all([
+        captureChart(trendChartRef),
+        captureChart(radarChartRef),
+      ])
+
+      const today = new Date()
+      const printDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`
+
+      const blob = await pdf(
+        <ResultPdfDocument
+          summaryData={summaryData}
+          scores={scores}
+          sortedMonths={sortedMonths}
+          commentsByMonth={commentsByMonth}
+          printDate={printDate}
+          trendChartImageUrl={trendChartImageUrl}
+          radarChartImageUrl={radarChartImageUrl}
+          trendData={trendData}
+        />
+      ).toBlob()
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const period = (summaryData?.period ?? '').replace(/\s+/g, '').replace('기준', '')
+      a.href = url
+      a.download = `평가결과_${period || '결과'}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
   return (
     <>
+      {pdfLoading && (
+        <div className="pdf-loading-overlay">
+          <div className="pdf-loading-spinner" />
+        </div>
+      )}
       <DashboardHeader />
       <main className="result-main">
 
@@ -81,8 +153,17 @@ function Result() {
         </div>
 
         <div className="result-top">
-          <h1 className="result-title">내 평가 결과</h1>
-          <p className="result-month">{summaryData?.period ?? ''} 기준</p>
+          <div>
+            <h1 className="result-title">내 평가 결과</h1>
+            <p className="result-month">{summaryData?.period ?? ''} 기준</p>
+          </div>
+          <button
+            className="pdf-export-btn"
+            onClick={exportPdf}
+            disabled={pdfLoading || summaryLoading || trendLoading || !chartReady}
+          >
+            PDF 내보내기
+          </button>
         </div>
 
         <div className="result-tabs">
@@ -105,9 +186,9 @@ function Result() {
             </span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">평가한 팀원 수</span>
+            <span className="summary-label">최근 평가 팀원 수</span>
             <span className="summary-score">
-              {summaryData?.evaluatorCount ?? '-'}<span className="summary-max">명</span>
+              {latestEvaluatorCount ?? '-'}<span className="summary-max">명</span>
             </span>
           </div>
           <div className="summary-card">
@@ -120,7 +201,7 @@ function Result() {
           </div>
         </div>
 
-        <section className="result-section chart-section">
+        <section className="result-section chart-section" ref={trendChartRef}>
           <div className="chart-header">
             <div>
               <h2 className="result-section-label">점수 변화 추이</h2>
@@ -154,6 +235,7 @@ function Result() {
                       strokeWidth={2}
                       dot={{ r: 5, strokeWidth: 2 }}
                       activeDot={{ r: 7 }}
+                      animationDuration={400}
                     />
                   ))}
                 </LineChart>
@@ -177,6 +259,7 @@ function Result() {
                     stroke={TREND_COLORS[i % TREND_COLORS.length]}
                     strokeWidth={2}
                     dot={{ r: 5, strokeWidth: 2 }}
+                    animationDuration={400}
                     activeDot={{ r: 7 }}
                   />
                 ))}
@@ -194,25 +277,27 @@ function Result() {
             ) : scores.length === 0 ? (
               <div className="no-result">해당 기간에 평가 데이터가 없어요</div>
             ) : (
-              <ResponsiveContainer width="100%" height={320}>
-                <RadarChart data={scores.map(s => ({ label: s.label, current: s.current, prev: s.prev }))}>
-                  <PolarGrid stroke="#E5E7EB" />
-                  <PolarAngleAxis dataKey="label" tick={{ fontSize: 12, fill: '#6B7280' }} />
-                  <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={{ fontSize: 10, fill: '#9CA3AF' }} />
-                  <Radar name="이전" dataKey="prev" stroke="#9CA3AF" fill="#9CA3AF" fillOpacity={0.2} strokeWidth={2} />
-                  <Radar name="현재" dataKey="current" stroke="#6D28D9" fill="#6D28D9" fillOpacity={0.3} strokeWidth={2} />
-                  <Legend
-                    wrapperStyle={{ paddingTop: 60, paddingLeft: 20 }}
-                    formatter={(value) => (
-                      <span style={{ fontSize: 13, color: value === '현재' ? '#6D28D9' : '#9CA3AF' }}>{value}</span>
-                    )}
-                  />
-                  <Tooltip
-                    contentStyle={{ border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: 13 }}
-                    formatter={(value, name) => [value, name]}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
+              <div ref={radarChartRef}>
+                <ResponsiveContainer width="100%" height={320}>
+                  <RadarChart data={scores.map(s => ({ label: s.label, current: s.current, prev: s.prev }))}>
+                    <PolarGrid stroke="#E5E7EB" />
+                    <PolarAngleAxis dataKey="label" tick={{ fontSize: 12, fill: '#6B7280' }} />
+                    <PolarRadiusAxis domain={[0, 5]} tickCount={6} tick={{ fontSize: 10, fill: '#9CA3AF' }} />
+                    <Radar name="이전" dataKey="prev" stroke="#9CA3AF" fill="#9CA3AF" fillOpacity={0.2} strokeWidth={2} isAnimationActive={false} />
+                    <Radar name="현재" dataKey="current" stroke="#6D28D9" fill="#6D28D9" fillOpacity={0.3} strokeWidth={2} isAnimationActive={false} />
+                    <Legend
+                      wrapperStyle={{ paddingTop: 60, paddingLeft: 20 }}
+                      formatter={(value) => (
+                        <span style={{ fontSize: 13, color: value === '현재' ? '#6D28D9' : '#9CA3AF' }}>{value}</span>
+                      )}
+                    />
+                    <Tooltip
+                      contentStyle={{ border: '1.5px solid #E5E7EB', borderRadius: 10, fontSize: 13 }}
+                      formatter={(value, name) => [value, name]}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
             )}
           </section>
 

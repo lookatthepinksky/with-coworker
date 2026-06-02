@@ -8,6 +8,7 @@ import com.devksg.withcoworkers.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public class EvaluationController {
     @PostMapping("/api/evaluations")
     public ResponseEntity<Void> submit(
         @AuthenticationPrincipal User user,
-        @RequestBody EvaluationRequest request
+        @Valid @RequestBody EvaluationRequest request
     ) {
         evaluationService.submit(user, request);
         return ResponseEntity.ok().build();

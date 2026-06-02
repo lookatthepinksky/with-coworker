@@ -28,6 +28,12 @@ public class ResultController {
     private final EvaluationScoreRepository evaluationScoreRepository;
     private final EvaluationRepository evaluationRepository;
 
+    @GetMapping("/latest-evaluator-count")
+    public ResponseEntity<Map<String, Long>> getLatestEvaluatorCount(@AuthenticationPrincipal User user) {
+        long count = evaluationRepository.countEvaluatorsForLatestMonth(user.getId());
+        return ResponseEntity.ok(Map.of("count", count));
+    }
+
     @GetMapping("/trend")
     public ResponseEntity<ScoreTrendResponse> getTrend(
             @AuthenticationPrincipal User user,
@@ -65,14 +71,9 @@ public class ResultController {
     @GetMapping("/summary")
     public ResponseEntity<ResultSummaryResponse> getSummary(
             @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "1m") String tab
+            @RequestParam(defaultValue = "1") int months
     ) {
-        int n = switch (tab) {
-            case "3m" -> 3;
-            case "6m" -> 6;
-            case "1y" -> 12;
-            default -> 1;
-        };
+        int n = months;
 
         LocalDate currentEnd = YearMonth.now().minusMonths(1).atDay(1);
         LocalDate currentStart = YearMonth.now().minusMonths(n).atDay(1);

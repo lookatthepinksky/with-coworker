@@ -15,7 +15,7 @@ function Header() {
       <div className="header-inner">
         <a href="/" className="logo">
           <span className="logo-emoji">🧑‍💻</span>
-          WithCoworker
+          WithCoworkers
         </a>
         <nav className="nav">
           <a href="#features">기능</a>

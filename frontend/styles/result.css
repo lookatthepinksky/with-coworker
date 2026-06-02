@@ -6,6 +6,59 @@
 
 .result-top {
   margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+/* PDF 로딩 오버레이 */
+.pdf-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-loading-spinner {
+  width: 52px;
+  height: 52px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: pdf-spin 0.75s linear infinite;
+}
+
+@keyframes pdf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.pdf-export-btn {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1.5px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.pdf-export-btn:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 111, 247, 0.3);
+}
+
+.pdf-export-btn:disabled,
+.pdf-export-btn.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 
@@ -351,6 +404,12 @@
   box-shadow: 0 2px 8px rgba(124, 111, 247, 0.3);
 }
 
+/* 레이더 차트 애니메이션 강제 제거 */
+.recharts-radar-polygon {
+  animation: none !important;
+  transition: none !important;
+}
+
 .chart-empty {
   height: 200px;
   display: flex;
@@ -359,4 +418,5 @@
   font-size: 0.88rem;
   color: var(--text-sub);
 }
+
 

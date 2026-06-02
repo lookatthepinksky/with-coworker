@@ -9,6 +9,7 @@ import TeamSelect from './pages/auth/TeamSelect.jsx'
 import Dashboard from './pages/dashboard/Dashboard.jsx'
 import Result from './pages/result/Result.jsx'
 import Evaluate from './pages/evaluate/Evaluate.jsx'
+import NotFound from './pages/notfound/NotFound.jsx'
 
 function ProtectedRoute({ children }) {
   const { loggedIn, loading } = useUser()
@@ -40,6 +41,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
         <Route path="/evaluate/:id" element={<ProtectedRoute><Evaluate /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
     </UserProvider>

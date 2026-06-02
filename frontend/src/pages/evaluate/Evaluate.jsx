@@ -22,7 +22,8 @@ function Evaluate() {
     setScores((prev) => ({ ...prev, [itemId]: value }))
   }
 
-  const isAllScored = items.length > 0 && items.every((item) => scores[item.id]) && comment.trim().length > 0
+  const commentLen = comment.trim().length
+  const isAllScored = items.length > 0 && items.every((item) => scores[item.id]) && commentLen >= 100 && commentLen <= 130
 
   const handleSubmit = async () => {
     if (!isAllScored || submitting) return
@@ -89,7 +90,12 @@ function Evaluate() {
         </div>
 
         <div className="evaluate-comment">
-          <label>💬 종합 의견 남기기 <span className="required">*</span></label>
+          <label>
+            💬 종합 의견 남기기 <span className="required">*</span>
+            <span className={`comment-count ${commentLen >= 100 && commentLen <= 130 ? 'done' : commentLen > 130 ? 'over' : ''}`}>
+              {comment.length} / 100~130자
+            </span>
+          </label>
           <textarea
             placeholder="건설적인 피드백은 팀 전체를 성장시켜요 ✍️"
             value={comment}
@@ -108,7 +114,11 @@ function Evaluate() {
               ? '평가 제출하기 🚀'
               : items.length - Object.keys(scores).length > 0
                 ? `${items.length - Object.keys(scores).length}개 항목이 남았어요`
-                : '한마디를 남겨주세요'}
+                : commentLen < 100
+                  ? `종합 의견을 ${100 - commentLen}자 더 써주세요`
+                  : commentLen > 130
+                    ? `${commentLen - 130}자 줄여주세요`
+                    : '한마디를 남겨주세요'}
         </button>
 
       </main>
