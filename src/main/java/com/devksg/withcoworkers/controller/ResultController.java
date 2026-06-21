@@ -30,7 +30,8 @@ public class ResultController {
 
     @GetMapping("/latest-evaluator-count")
     public ResponseEntity<Map<String, Long>> getLatestEvaluatorCount(@AuthenticationPrincipal User user) {
-        long count = evaluationRepository.countEvaluatorsForLatestMonth(user.getId());
+        LocalDate lastMonth = YearMonth.now().minusMonths(1).atDay(1);
+        long count = evaluationRepository.countEvaluatorsForLatestMonth(user.getId(), lastMonth);
         return ResponseEntity.ok(Map.of("count", count));
     }
 

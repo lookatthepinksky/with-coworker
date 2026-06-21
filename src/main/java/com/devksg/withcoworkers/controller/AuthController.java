@@ -1,5 +1,6 @@
 package com.devksg.withcoworkers.controller;
 
+import com.devksg.withcoworkers.config.CustomUserDetails;
 import com.devksg.withcoworkers.config.JwtTokenProvider;
 import com.devksg.withcoworkers.domain.AuthProvider;
 import com.devksg.withcoworkers.domain.ProviderType;
@@ -9,9 +10,16 @@ import com.devksg.withcoworkers.dto.SignupRequest;
 import com.devksg.withcoworkers.repository.AuthProviderRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
+import com.devksg.withcoworkers.service.LoginAttemptService;
 import com.devksg.withcoworkers.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -29,23 +37,42 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserSessionService userSessionService;
+    private final AuthenticationManager authenticationManager;
+    private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
     @Transactional
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        var found = authProviderRepository.findByProviderAndProviderId(ProviderType.LOCAL, request.getLoginId());
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getLoginId(), request.getPassword())
+            );
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            User user = userDetails.getUser();
+            loginAttemptService.recordSuccess(request.getLoginId());
+            String token = jwtTokenProvider.generateToken(user.getId());
+            userSessionService.save(user.getId(), token);
+            boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
+            String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
+            return ResponseEntity.ok(Map.of("token", token, "redirectPath", redirectPath));
+        } catch (LockedException e) {
+            return ResponseEntity.status(429).body(Map.of("message", "로그인 시도 횟수를 초과했습니다. 10분 후 다시 시도해주세요."));
+        } catch (BadCredentialsException e) {
+            loginAttemptService.recordFailure(request.getLoginId());
+            int remaining = loginAttemptService.getRemainingAttempts(request.getLoginId());
+            String message = remaining > 0
+                    ? "아이디 또는 비밀번호가 올바르지 않습니다. (남은 시도: " + remaining + "회)"
+                    : "로그인 시도 횟수를 초과했습니다. 10분 후 다시 시도해주세요.";
+            return ResponseEntity.status(401).body(Map.of("message", message));
+        }
+    }
 
-        return found
-            .filter(ap -> passwordEncoder.matches(request.getPassword(), ap.getPasswordHash()))
-            .map(ap -> {
-                User user = ap.getUser();
-                String token = jwtTokenProvider.generateToken(user.getId());
-                userSessionService.save(user.getId(), token);
-                boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
-                String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
-                return ResponseEntity.ok(Map.of("token", token, "redirectPath", redirectPath));
-            })
-            .orElse(ResponseEntity.status(401).body(Map.of("message", "아이디 또는 비밀번호가 올바르지 않습니다.")));
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal User user) {
+        if (user != null) {
+            userSessionService.invalidate(user.getId());
+        }
+        return ResponseEntity.ok(Map.of("message", "로그아웃되었습니다."));
     }
 
     @PostMapping("/signup")

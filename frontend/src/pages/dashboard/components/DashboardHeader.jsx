@@ -5,9 +5,13 @@ import '@styles/dashboard-header.css'
 function DashboardHeader() {
   const { userName } = useUser()
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    window.location.href = '/'
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/logout')
+    } finally {
+      localStorage.removeItem('token')
+      window.location.href = '/'
+    }
   }
 
   const handleDeleteAccount = async () => {

@@ -4,12 +4,45 @@ import api from '@api/client'
 import DashboardHeader from './components/DashboardHeader.jsx'
 import '@styles/dashboard.css'
 
+function PendingModal({ members, onApprove, onReject, onClose }) {
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <h2 className="modal-title">가입 승인 요청</h2>
+        <p className="modal-desc">아래 팀원이 가입 승인을 기다리고 있어요</p>
+
+        <div className="modal-member-list">
+          {members.map((m) => (
+            <div className="modal-member-item" key={m.teamMemberId}>
+              <div className="modal-member-info">
+                <span className="modal-member-name">{m.name}</span>
+                <span className="modal-member-email">{m.email}</span>
+              </div>
+              <div className="modal-member-actions">
+                <button className="btn-approve" onClick={() => onApprove(m.teamMemberId)}>승인</button>
+                <button className="btn-reject" onClick={() => onReject(m.teamMemberId)}>거절</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn-modal-close" onClick={onClose}>나중에 처리</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Dashboard() {
   const navigate = useNavigate()
   const [userName, setUserName] = useState('')
   const [teamName, setTeamName] = useState('')
   const [teammates, setTeammates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [pendingMembers, setPendingMembers] = useState([])
+  const [showPendingModal, setShowPendingModal] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -21,19 +54,50 @@ function Dashboard() {
   }, [])
 
   useEffect(() => {
-    api.get('/api/dashboard')
-      .then(({ data }) => {
+    const fetchData = async () => {
+      try {
+        const { data } = await api.get('/api/dashboard')
         setUserName(data.userName || '')
         setTeamName(data.teamName || '')
         setTeammates(data.teammates)
+        setIsAdmin(data.isAdmin || false)
         setLoading(false)
-      })
-      .catch((err) => {
+
+        if (data.isAdmin) {
+          const { data: pending } = await api.get('/api/teams/pending')
+          if (pending.length > 0) {
+            setPendingMembers(pending)
+            setShowPendingModal(true)
+          }
+        }
+      } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
           navigate('/')
         }
-      })
+      }
+    }
+    fetchData()
   }, [navigate])
+
+  const refreshTeammates = async () => {
+    const { data } = await api.get('/api/dashboard')
+    setTeammates(data.teammates)
+  }
+
+  const handleApprove = async (teamMemberId) => {
+    await api.post(`/api/teams/members/${teamMemberId}/approve`)
+    const updated = pendingMembers.filter((m) => m.teamMemberId !== teamMemberId)
+    setPendingMembers(updated)
+    if (updated.length === 0) setShowPendingModal(false)
+    refreshTeammates()
+  }
+
+  const handleReject = async (teamMemberId) => {
+    await api.delete(`/api/teams/members/${teamMemberId}`)
+    const updated = pendingMembers.filter((m) => m.teamMemberId !== teamMemberId)
+    setPendingMembers(updated)
+    if (updated.length === 0) setShowPendingModal(false)
+  }
 
   const doneCount = teammates.filter((t) => t.done).length
 
@@ -42,6 +106,16 @@ function Dashboard() {
   return (
     <>
       <DashboardHeader />
+
+      {showPendingModal && (
+        <PendingModal
+          members={pendingMembers}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onClose={() => setShowPendingModal(false)}
+        />
+      )}
+
       <main className="dashboard-main">
 
         <div className="page-nav">
@@ -50,7 +124,7 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-greeting">
-          {teamName && <span className="team-badge">🏷️ {teamName}</span>}
+          {teamName && <span className="team-badge">🏷️ {teamName}{isAdmin && ' · 팀장'}</span>}
           <h1>안녕하세요, {userName}님 👋</h1>
           <p>이번 달 팀원 평가를 완료해주세요</p>
         </div>
@@ -74,7 +148,18 @@ function Dashboard() {
           </div>
 
           <section className="dashboard-section">
-            <h2 className="section-label">이번 달 팀원 평가</h2>
+            <h2 className="section-label">
+              이번 달 팀원 평가
+              {isAdmin && pendingMembers.length > 0 && (
+                <button
+                  className="section-sub"
+                  style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', fontWeight: '700' }}
+                  onClick={() => setShowPendingModal(true)}
+                >
+                  승인 대기 {pendingMembers.length}명
+                </button>
+              )}
+            </h2>
             <div className="teammate-list">
               {teammates.map((t) => (
                 <div className="teammate-card" key={t.id}>
@@ -99,7 +184,6 @@ function Dashboard() {
             </div>
           </section>
         </div>
-
 
       </main>
     </>

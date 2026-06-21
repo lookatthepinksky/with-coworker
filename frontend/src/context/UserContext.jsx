@@ -15,6 +15,7 @@ function getTokenExpiry(token) {
 export function UserProvider({ children }) {
   const [userName, setUserName] = useState('')
   const [loggedIn, setLoggedIn] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const [loading, setLoading] = useState(true)
   const timerRef = useRef(null)
 
@@ -30,6 +31,7 @@ export function UserProvider({ children }) {
       .then(({ data }) => {
         setLoggedIn(!!data.loggedIn)
         setUserName(data.name ?? '')
+        setIsPending(!!data.isPending)
 
         if (data.loggedIn) {
           const token = localStorage.getItem('token')
@@ -51,7 +53,7 @@ export function UserProvider({ children }) {
   }, [])
 
   return (
-    <UserContext.Provider value={{ userName, loggedIn, loading }}>
+    <UserContext.Provider value={{ userName, loggedIn, isPending, loading }}>
       {children}
     </UserContext.Provider>
   )

@@ -1,12 +1,6 @@
 
 const features = [
   {
-    icon: '🕵️',
-    badge: 'anonymous: true',
-    title: '철저한 익명',
-    desc: '누가 뭐라고 했는지 절대 안 나와요. 진짜로요. 코드로 보장합니다.',
-  },
-  {
     icon: '📝',
     badge: 'items: [...]',
     title: '항목별 평가',

@@ -6,7 +6,7 @@ function Hero() {
   return (
     <section className="hero">
       <div className="hero-inner">
-        <span className="hero-badge">// 익명 보장됨 ✓</span>
+        <span className="hero-badge"></span>
         <h1 className="hero-title">
           팀원한테 솔직해질<br />
           <em>용기가 생겼어요</em> 👀

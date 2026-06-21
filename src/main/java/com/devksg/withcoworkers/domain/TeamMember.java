@@ -25,9 +25,23 @@ public class TeamMember {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TeamMemberRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TeamMemberStatus status;
+
     @Builder
-    public TeamMember(Team team, User user) {
+    public TeamMember(Team team, User user, TeamMemberRole role, TeamMemberStatus status) {
         this.team = team;
         this.user = user;
+        this.role = role != null ? role : TeamMemberRole.MEMBER;
+        this.status = status != null ? status : TeamMemberStatus.PENDING;
+    }
+
+    public void approve() {
+        this.status = TeamMemberStatus.APPROVED;
     }
 }

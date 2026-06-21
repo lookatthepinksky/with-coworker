@@ -1,6 +1,7 @@
 package com.devksg.withcoworkers.config;
 
 import com.devksg.withcoworkers.domain.ProviderType;
+import com.devksg.withcoworkers.domain.TeamMemberStatus;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.repository.AuthProviderRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
@@ -40,9 +41,20 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = authProvider.getUser();
         String token = jwtTokenProvider.generateToken(user.getId());
         userSessionService.save(user.getId(), token);
-        boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
-        String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
 
-        response.sendRedirect(frontendUrl + redirectPath + "?token=" + token);
+        boolean isApproved = teamMemberRepository.existsByUserIdAndStatus(user.getId(), TeamMemberStatus.APPROVED);
+        boolean hasPending = !isApproved && teamMemberRepository.existsByUserId(user.getId());
+
+        String redirectPath;
+        if (isApproved) {
+            redirectPath = "/dashboard";
+        } else if (hasPending) {
+            redirectPath = "/team-select?pending=true";
+        } else {
+            redirectPath = "/team-select";
+        }
+
+        String separator = redirectPath.contains("?") ? "&" : "?";
+        response.sendRedirect(frontendUrl + redirectPath + separator + "token=" + token);
     }
 }

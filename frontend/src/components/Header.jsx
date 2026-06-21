@@ -3,11 +3,15 @@ import { useUser } from '@context/UserContext.jsx'
 import '@styles/header.css'
 
 function Header() {
-  const { loggedIn } = useUser()
+  const { loggedIn, isPending } = useUser()
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    window.location.href = '/'
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/logout')
+    } finally {
+      localStorage.removeItem('token')
+      window.location.href = '/'
+    }
   }
 
   return (
@@ -24,8 +28,14 @@ function Header() {
         <div className="header-actions">
           {loggedIn ? (
             <>
-              <a href="/dashboard" className="btn-header">팀원 평가</a>
-              <a href="/result" className="btn-header">내 평가</a>
+              {isPending ? (
+                <span className="btn-header-pending">가입 승인 대기중</span>
+              ) : (
+                <>
+                  <a href="/dashboard" className="btn-header">팀원 평가</a>
+                  <a href="/result" className="btn-header">내 평가</a>
+                </>
+              )}
               <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
             </>
           ) : (

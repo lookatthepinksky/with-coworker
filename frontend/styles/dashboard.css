@@ -196,3 +196,165 @@
   margin-top: 4px;
 }
 
+
+
+.pending-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.pending-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.pending-icon {
+  font-size: 3rem;
+}
+
+.pending-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.pending-desc {
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  max-width: 280px;
+  line-height: 1.6;
+}
+
+/* ── Pending Approval Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.modal-desc {
+  font-size: 0.875rem;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+}
+
+.modal-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.modal-member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg-card, #f8f9fb);
+  border-radius: 10px;
+}
+
+.modal-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-member-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.modal-member-email {
+  font-size: 0.775rem;
+  color: var(--text-sub);
+}
+
+.modal-member-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-approve {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-approve:hover {
+  background: var(--primary-dark);
+}
+
+.btn-reject {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  background: transparent;
+  border: 1.5px solid #ddd;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-reject:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-modal-close {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  background: transparent;
+  border: 1.5px solid #ddd;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btn-modal-close:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}

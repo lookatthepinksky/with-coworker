@@ -1,6 +1,7 @@
 package com.devksg.withcoworkers.service;
 
 import com.devksg.withcoworkers.domain.TeamMember;
+import com.devksg.withcoworkers.domain.TeamMemberRole;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.dto.DashboardResponse;
 import com.devksg.withcoworkers.repository.EvaluationRepository;
@@ -32,9 +33,20 @@ public class DashboardService {
     public DashboardResponse getDashboard(User me, String month) {
         LocalDate targetMonth = YearMonth.parse(month, MONTH_FORMATTER).atDay(1);
 
+        // findByUserId now returns only APPROVED memberships
         TeamMember myMembership = teamMemberRepository.findByUserId(me.getId()).orElse(null);
-        String teamName = myMembership != null ? myMembership.getTeam().getName() : null;
 
+        // check for pending membership if no approved one exists
+        TeamMember pendingMembership = myMembership == null
+                ? teamMemberRepository.findPendingMembershipByUserId(me.getId()).orElse(null)
+                : null;
+        boolean isPending = pendingMembership != null;
+
+        String teamName = myMembership != null ? myMembership.getTeam().getName()
+                : (pendingMembership != null ? pendingMembership.getTeam().getName() : null);
+        boolean isAdmin = myMembership != null && myMembership.getRole() == TeamMemberRole.ADMIN;
+
+        // findByTeamIdAndUserIdNot now returns only APPROVED teammates
         List<User> others = myMembership == null
                 ? Collections.emptyList()
                 : teamMemberRepository
@@ -65,6 +77,8 @@ public class DashboardService {
         return DashboardResponse.builder()
                 .userName(me.getName())
                 .teamName(teamName)
+                .isAdmin(isAdmin)
+                .isPending(isPending)
                 .teammates(teammates)
                 .myScores(myScores)
                 .build();

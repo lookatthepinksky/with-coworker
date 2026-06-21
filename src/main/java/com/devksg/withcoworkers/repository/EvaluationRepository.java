@@ -55,11 +55,12 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
         SELECT COUNT(DISTINCT e.evaluator.id)
         FROM Evaluation e
         WHERE e.evaluatee.id = :userId
-          AND e.targetMonth = (
-              SELECT MAX(e2.targetMonth) FROM Evaluation e2 WHERE e2.evaluatee.id = :userId
-          )
+          AND e.targetMonth = :lastMonth
     """)
-    long countEvaluatorsForLatestMonth(@Param("userId") Long userId);
+    long countEvaluatorsForLatestMonth(
+        @Param("userId") Long userId,
+        @Param("lastMonth") LocalDate lastMonth
+    );
 
     @Query("""
         SELECT DISTINCT tm.user FROM TeamMember tm

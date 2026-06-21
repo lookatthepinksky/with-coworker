@@ -122,6 +122,7 @@ function Result() {
           trendChartImageUrl={trendChartImageUrl}
           radarChartImageUrl={radarChartImageUrl}
           trendData={trendData}
+          latestEvaluatorCount={latestEvaluatorCount}
         />
       ).toBlob()
 

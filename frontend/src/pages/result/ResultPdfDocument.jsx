@@ -149,7 +149,7 @@ function ScoreDiffText({ diff }) {
 
 export default function ResultPdfDocument({
   summaryData, scores, sortedMonths, commentsByMonth,
-  printDate, trendChartImageUrl, radarChartImageUrl, trendData,
+  printDate, trendChartImageUrl, radarChartImageUrl, trendData, latestEvaluatorCount,
 }) {
   // 월별 테이블용 데이터 가공
   const trendMonths = (trendData ?? []).map(d => d.month)
@@ -187,8 +187,8 @@ export default function ResultPdfDocument({
               <Text style={s.summaryValue}>{average} / 5.0</Text>
             </View>
             <View style={s.summaryCard}>
-              <Text style={s.summaryLabel}>평가한 팀원 수</Text>
-              <Text style={s.summaryValue}>{summaryData?.evaluatorCount ?? '-'}명</Text>
+              <Text style={s.summaryLabel}>최근 평가 팀원 수</Text>
+              <Text style={s.summaryValue}>{latestEvaluatorCount ?? '-'}명</Text>
             </View>
             <View style={s.summaryCard}>
               <Text style={s.summaryLabel}>가장 높은 항목</Text>
