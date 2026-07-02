@@ -49,7 +49,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/api/companies/search").permitAll()
+                .requestMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/api/companies/search", "/api/visitor").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )
