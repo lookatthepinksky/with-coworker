@@ -11,7 +11,7 @@ public class EvaluationRequest {
     private Long evaluateeId;
     private String targetMonth;
 
-    @Size(min = 100, max = 130, message = "종합 의견은 100자 이상 130자 이하로 작성해주세요.")
+    @Size(max = 150, message = "종합 의견은 150자 이하로 작성해주세요.")
     private String comment;
 
     private List<ScoreItem> scores;

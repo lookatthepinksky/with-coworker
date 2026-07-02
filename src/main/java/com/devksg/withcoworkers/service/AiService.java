@@ -46,6 +46,7 @@ public class AiService {
         - 과도하게 칭찬하거나 비판하지 말 것
         - 평가서에 그대로 제출 가능한 수준으로 작성
         - 결과 문장만 출력
+        - 결과 문장이 총 몇 자 인지 적어주면 안됨
         """;
 
     private final RestClient restClient;

@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  app:
+    image: withcoworkers-app
+    container_name: withcoworkers-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/main/resources/application-local.properties:/app/application-local.properties
+    environment:
+      # 로컬과 달라지는 것만 오버라이드
+      REDIS_HOST: withcoworkers-redis
+      SQS_ENDPOINT_OVERRIDE: http://withcoworkers-localstack:4566
+    depends_on:
+      redis:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+
   localstack:
     image: localstack/localstack:3.0
     container_name: withcoworkers-localstack
@@ -18,6 +35,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   redis:
     image: redis:7-alpine
     container_name: withcoworkers-redis
