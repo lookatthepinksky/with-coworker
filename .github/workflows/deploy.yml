@@ -39,5 +39,4 @@ jobs:
           script: |
             cd ~/with-coworker
             docker compose down
-	    docker compose down --rmi all -v
             docker compose up --build -d
