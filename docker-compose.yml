@@ -24,7 +24,6 @@ services:
       AWS_REGION: ${AWS_REGION}
       REDIS_HOST: withcoworkers-redis
       REDIS_PORT: 6379
-      SQS_ENDPOINT_OVERRIDE: http://withcoworkers-localstack:4566
     depends_on:
       redis:
         condition: service_started
