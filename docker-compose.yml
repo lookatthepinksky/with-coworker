@@ -1,44 +1,33 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
-      dockerfile : Dockerfile
+      dockerfile: Dockerfile
     image: withcoworkers-app
     container_name: withcoworkers-app
     ports:
       - "8080:8080"
-    volumes:
-      - ./src/main/resources/application-local.properties:/app/application-local.properties
     environment:
-      # 로컬과 달라지는 것만 오버라이드
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP_MS: ${JWT_EXP_MS}
+      SES_FROM_EMAIL: ${SES_FROM_EMAIL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AI_USAGE_LIMIT: ${AI_USAGE_LIMIT}
+      FRONTEND_URL: ${FRONTEND_URL}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
       REDIS_HOST: withcoworkers-redis
+      REDIS_PORT: 6379
       SQS_ENDPOINT_OVERRIDE: http://withcoworkers-localstack:4566
     depends_on:
       redis:
         condition: service_started
-      localstack:
-        condition: service_healthy
-
-  localstack:
-    image: localstack/localstack:3.0
-    container_name: withcoworkers-localstack
-    ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=sqs,ses
-      - DEFAULT_REGION=ap-northeast-2
-      - AWS_DEFAULT_REGION=ap-northeast-2
-    volumes:
-      - ./localstack-init:/etc/localstack/init/ready.d
-      - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: redis:7-alpine
     container_name: withcoworkers-redis
