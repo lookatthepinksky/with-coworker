@@ -2,9 +2,11 @@ package com.devksg.withcoworkers.config;
 
 import com.devksg.withcoworkers.service.CustomUserDetailsService;
 import com.devksg.withcoworkers.service.OAuth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -50,8 +52,15 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/oauth2/**", "/login/**", "/api/auth/**", "/api/companies/search", "/api/visitor").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/user/me").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                })
             )
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
