@@ -22,6 +22,7 @@ function Evaluate() {
   const [aiLimit, setAiLimit] = useState(null)
 
   useEffect(() => {
+    if (!id) return
     api.get(`/api/evaluate/${id}`).then(({ data }) => setName(data.name))
     api.get('/api/evaluation-items').then(({ data }) => setItems(data))
     api.get(`/api/ai/usage?evaluateeId=${id}`)
