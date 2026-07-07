@@ -1,9 +1,9 @@
 {
   "rewrites": [
-    { "source": "/api/:path*", "destination": "http://3.35.112.184:8080/api/:path*" },
-    { "source": "/oauth2/:path*", "destination": "http://3.35.112.184:8080/oauth2/:path*" },
-    { "source": "/login/oauth2/:path*", "destination": "http://3.35.112.184:8080/login/oauth2/:path*" },
-    { "source": "/logout", "destination": "http://3.35.112.184:8080/logout" },
+    { "source": "/api/:path*", "destination": "http://3.35.112.184/api/:path*" },
+    { "source": "/oauth2/:path*", "destination": "http://3.35.112.184/oauth2/:path*" },
+    { "source": "/login/oauth2/:path*", "destination": "http://3.35.112.184/login/oauth2/:path*" },
+    { "source": "/logout", "destination": "http://3.35.112.184/logout" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
