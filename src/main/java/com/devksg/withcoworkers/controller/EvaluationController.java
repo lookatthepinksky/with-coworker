@@ -3,7 +3,6 @@ package com.devksg.withcoworkers.controller;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.dto.EvaluationRequest;
 import com.devksg.withcoworkers.repository.EvaluationItemRepository;
-import com.devksg.withcoworkers.repository.UserRepository;
 import com.devksg.withcoworkers.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ public class EvaluationController {
 
     private final EvaluationService evaluationService;
     private final EvaluationItemRepository evaluationItemRepository;
-    private final UserRepository userRepository;
 
     @GetMapping("/api/evaluation-items")
     public ResponseEntity<List<Map<String, Object>>> getItems() {
@@ -35,9 +33,11 @@ public class EvaluationController {
     }
 
     @GetMapping("/api/evaluate/{id}")
-    public ResponseEntity<Map<String, String>> getEvaluateTarget(@PathVariable Long id) {
-        User target = userRepository.findById(id).orElseThrow();
-        return ResponseEntity.ok(Map.of("name", target.getName()));
+    public ResponseEntity<Map<String, String>> getEvaluateTarget(
+        @AuthenticationPrincipal User user,
+        @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(evaluationService.getEvaluateTarget(user, id));
     }
 
     @PostMapping("/api/evaluations")

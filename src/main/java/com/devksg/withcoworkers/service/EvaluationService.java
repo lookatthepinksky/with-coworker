@@ -3,6 +3,7 @@ package com.devksg.withcoworkers.service;
 import com.devksg.withcoworkers.domain.Evaluation;
 import com.devksg.withcoworkers.domain.EvaluationItem;
 import com.devksg.withcoworkers.domain.EvaluationScore;
+import com.devksg.withcoworkers.domain.TeamMemberStatus;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.dto.EvaluationRequest;
 import com.devksg.withcoworkers.repository.EvaluationItemRepository;
@@ -11,12 +12,15 @@ import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,13 @@ public class EvaluationService {
     private final EvaluationItemRepository evaluationItemRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final UserRepository userRepository;
+
+    public Map<String, String> getEvaluateTarget(User evaluator, Long targetId) {
+        LocalDate targetMonth = YearMonth.now().minusMonths(1).atDay(1);
+        String name = userRepository.findEvaluatableTargetName(evaluator.getId(), targetId, targetMonth,TeamMemberStatus.APPROVED)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 접근입니다."));
+        return Map.of("name", name);
+    }
 
     @Transactional
     public void submit(User evaluator, EvaluationRequest request) {

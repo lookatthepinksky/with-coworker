@@ -41,8 +41,10 @@ public class AuthController {
     private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
-    @Transactional
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        if (authProviderRepository.findByProviderAndProviderId(ProviderType.LOCAL, request.getLoginId()).isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("message", "존재하지 않는 아이디입니다."));
+        }
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getLoginId(), request.getPassword())

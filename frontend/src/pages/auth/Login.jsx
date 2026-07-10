@@ -19,7 +19,11 @@ function Login() {
       localStorage.setItem('token', res.data.token)
       window.location.href = res.data.redirectPath
     } catch (err) {
-      setError(err.response?.data?.message || '로그인에 실패했습니다.')
+      if (err.response?.status === 404) {
+        alert('존재하지 않는 아이디입니다.')
+      } else {
+        setError(err.response?.data?.message || '로그인에 실패했습니다.')
+      }
     } finally {
       setLoading(false)
     }

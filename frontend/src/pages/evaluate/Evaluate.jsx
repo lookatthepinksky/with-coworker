@@ -22,7 +22,12 @@ function Evaluate() {
   const [aiLimit, setAiLimit] = useState(null)
 
   useEffect(() => {
-    api.get(`/api/evaluate/${id}`).then(({ data }) => setName(data.name))
+    api.get(`/api/evaluate/${id}`)
+      .then(({ data }) => setName(data.name))
+      .catch(() => {
+        alert('잘못된 접근입니다.')
+        window.location.href = '/dashboard'
+      })
     api.get('/api/evaluation-items').then(({ data }) => setItems(data))
     api.get(`/api/ai/usage?evaluateeId=${id}`)
       .then(({ data }) => { setAiRemaining(data.remaining); setAiLimit(data.limit) })
