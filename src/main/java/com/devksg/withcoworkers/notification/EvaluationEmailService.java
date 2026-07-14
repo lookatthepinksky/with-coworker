@@ -20,14 +20,14 @@ public class EvaluationEmailService {
     @Value("${ses.from-email}")
     private String fromEmail;
 
-    private static final String SITE_URL = "https://www.withcoworkers.com";
+    private static final String SITE_URL = "https://with-coworker.vercel.app";
 
     public void sendEmail(EmailMessage message) {
         String subject = buildSubject(message);
 
         try {
             sesClient.sendEmail(SendEmailRequest.builder()
-                    .source(fromEmail)
+                    .source("with-coworkers <" + fromEmail + ">")
                     .destination(Destination.builder()
                             .toAddresses(message.userEmail())
                             .build())
