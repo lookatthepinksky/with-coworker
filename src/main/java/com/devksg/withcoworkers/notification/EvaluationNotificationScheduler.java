@@ -51,7 +51,7 @@ public class EvaluationNotificationScheduler {
 
         //개발
         List<User> users = userRepository.findAll().stream()
-                .filter(u -> "kimshinejade@gmail.com".equals(u.getEmail()))
+                .filter(u -> "tnrud3218@naver.com".equals(u.getEmail()))
                 .toList();
         //운영
         //List<User> users = (type == EmailNotificationType.START)
