@@ -23,20 +23,22 @@ public class EvaluationNotificationScheduler {
     private final SqsProducerService sqsProducerService;
 
     // 매월 1일 오전 9시 - 평가 시작 안내
-
-    @Scheduled(cron = "0 0 9 1 * *", zone = "Asia/Seoul")
+    // @Scheduled(cron = "0 0 9 1 * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void sendStartNotification() {
         sendNotifications(EmailNotificationType.START);
     }
 
     // 매월 5일 오전 9시 - 마감 2일 전 안내
-    @Scheduled(cron = "0 0 9 5 * *", zone = "Asia/Seoul")
+    // @Scheduled(cron = "0 0 9 5 * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void sendReminderNotification() {
         sendNotifications(EmailNotificationType.REMINDER);
     }
 
     // 매월 7일 오전 9시 - 마감 당일 안내
-    @Scheduled(cron = "0 0 9 7 * *", zone = "Asia/Seoul")
+    // @Scheduled(cron = "0 0 9 7 * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void sendDeadlineNotification() {
         sendNotifications(EmailNotificationType.DEADLINE);
     }

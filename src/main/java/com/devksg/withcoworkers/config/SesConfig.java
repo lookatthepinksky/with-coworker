@@ -21,12 +21,19 @@ public class SesConfig {
     @Bean
     public SesClient sesClient() {
         SesClientBuilder builder = SesClient.builder()
-                .region(Region.of(props.getRegion()))
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(props.getAccessKey(), props.getSecretKey())
-                        )
-                );
+                .region(Region.of(props.getRegion()));
+
+        // 키가 둘 다 있을 때만 static credentials (로컬/LocalStack)
+        // 없으면 건너뛰어 SDK 기본 체인(EC2 IAM Role)이 자동 적용됨
+        if (StringUtils.hasText(props.getAccessKey())
+                && StringUtils.hasText(props.getSecretKey())) {
+            builder.credentialsProvider(
+                    StaticCredentialsProvider.create(
+                            AwsBasicCredentials.create(
+                                    props.getAccessKey(), props.getSecretKey())
+                    )
+            );
+        }
 
         if (StringUtils.hasText(props.getEndpointOverride())) {
             builder.endpointOverride(URI.create(props.getEndpointOverride()));

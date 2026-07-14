@@ -21,12 +21,19 @@ public class SqsConfig {
     @Bean
     public SqsClient sqsClient() {
         SqsClientBuilder builder = SqsClient.builder()
-                .region(Region.of(props.getRegion()))
-                .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(props.getAccessKey(), props.getSecretKey())
-                        )
-                );
+                .region(Region.of(props.getRegion()));
+
+        // 키가 둘 다 있을 때만 static credentials (로컬/LocalStack)
+        // 없으면 이 블록을 건너뛰어 SDK 기본 체인(EC2 IAM Role)이 자동 적용됨
+        if (StringUtils.hasText(props.getAccessKey()) //빈 키를 넣지 않게 막아서, SDK가 Role로 넘어갈 길을 열어줌
+                && StringUtils.hasText(props.getSecretKey())) {
+            builder.credentialsProvider(
+                    StaticCredentialsProvider.create(
+                            AwsBasicCredentials.create(
+                                    props.getAccessKey(), props.getSecretKey())
+                    )
+            );
+        }
 
         // 로컬(LocalStack)일 때만 endpoint override 적용
         if (StringUtils.hasText(props.getEndpointOverride())) {
