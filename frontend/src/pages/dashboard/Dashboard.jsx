@@ -101,6 +101,11 @@ function Dashboard() {
 
   const doneCount = teammates.filter((t) => t.done).length
 
+  const evalDate = new Date()
+  evalDate.setMonth(evalDate.getMonth() - 1)
+  const evalYear = evalDate.getFullYear()
+  const evalMonth = evalDate.getMonth() + 1
+
   if (loading) return null
 
   return (
@@ -126,7 +131,7 @@ function Dashboard() {
         <div className="dashboard-greeting">
           {teamName && <span className="team-badge">🏷️ {teamName}{isAdmin && ' · 팀장'}</span>}
           <h1>안녕하세요, {userName}님 👋</h1>
-          <p>이번 달 팀원 평가를 완료해주세요</p>
+          <p>{evalYear}년 {evalMonth}월 팀원 평가를 {teammates.length > 0 && doneCount === teammates.length ? '완료하였습니다' : '완료해주세요'}</p>
         </div>
 
         <div className="dashboard-block">

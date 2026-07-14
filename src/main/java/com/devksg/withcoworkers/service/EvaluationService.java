@@ -12,6 +12,7 @@ import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,14 +66,19 @@ public class EvaluationService {
             throw new IllegalStateException("이미 해당 월에 평가를 완료했습니다.");
         }
 
-        Evaluation evaluation = evaluationRepository.save(
-            Evaluation.builder()
-                .evaluator(evaluator)
-                .evaluatee(evaluatee)
-                .comment(request.getComment())
-                .targetMonth(targetMonth)
-                .build()
-        );
+        Evaluation evaluation;
+        try {
+            evaluation = evaluationRepository.save(
+                Evaluation.builder()
+                    .evaluator(evaluator)
+                    .evaluatee(evaluatee)
+                    .comment(request.getComment())
+                    .targetMonth(targetMonth)
+                    .build()
+            );
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalStateException("이미 해당 월에 평가를 완료했습니다.");
+        }
 
         for (EvaluationRequest.ScoreItem scoreItem : request.getScores()) {
             EvaluationItem item = evaluationItemRepository.findById(scoreItem.getItemId()).orElseThrow();
