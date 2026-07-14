@@ -48,7 +48,7 @@ public class SqsConsumerService {
      * SQS 메시지 폴링 - 5초 간격, long-poll(20초) 방식으로 효율적 처리
      * 수신된 메시지는 emailTaskExecutor 스레드 풀에서 비동기 병렬 처리
      */
-    //@Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 5000)
     public void pollAndProcess() {
         List<Message> messages;
         try {
