@@ -26,8 +26,15 @@
 }
 
 .dashboard-greeting p {
-  font-size: 0.93rem;
-  color: var(--text-sub);
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.greeting-month {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.1rem;
 }
 
 /* 통계 카드 */

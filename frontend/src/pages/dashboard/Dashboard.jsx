@@ -131,7 +131,10 @@ function Dashboard() {
         <div className="dashboard-greeting">
           {teamName && <span className="team-badge">🏷️ {teamName}{isAdmin && ' · 팀장'}</span>}
           <h1>안녕하세요, {userName}님 👋</h1>
-          <p>{evalYear}년 {evalMonth}월 팀원 평가를 {teammates.length > 0 && doneCount === teammates.length ? '완료하였습니다' : '완료해주세요'}</p>
+          <p className="greeting-status">
+            <span className="greeting-month">{evalYear}년 {evalMonth}월</span>
+            {' '}팀원 평가를 {teammates.length > 0 && doneCount === teammates.length ? '완료하였습니다 ✓' : '완료해주세요'}
+          </p>
         </div>
 
         <div className="dashboard-block">
