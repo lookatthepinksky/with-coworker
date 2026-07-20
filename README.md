@@ -22,7 +22,7 @@
 ---
 
 ## 🏗 시스템 아키텍처 (Architecture)
-![System Architecture](./images/architecture.png)
+![System Architecture](./sys_archt.png)
 
 ### 💡 주요 아키텍처 설계 특징
 1. **인프라 격리 및 자원 효율성:** 단일 EC2 인프라 내에서 Docker를 활용하여 웹 서버(Nginx), 애플리케이션(Spring Boot), 인메모리 캐시(Redis)를 독립된 컨테이너로 격리하여 비용을 최적화하고 환경 일관성을 확보했습니다.
