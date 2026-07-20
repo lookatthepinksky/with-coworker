@@ -3,7 +3,7 @@
 
 - **개발 기간:** 2026.05 ~ 2026.07 (1인 개발)
 - **서비스 링크:** [With Coworkers 바로가기](https://withcoworker.vercel.app)
-- **테스트 계정:** ID: ksg / PW: gogo11##
+- **테스트 계정:** 포트폴리오 pdf 파일 참조 부탁드립니다.
 
 ---
 
