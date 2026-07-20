@@ -6,6 +6,13 @@ on:
     paths-ignore:
       - 'frontend/**'
       - '**.md'
+      - '**.png'
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.gif'
+      - '**.svg'
+      - '**.ico'
+      - '**.webp'
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
