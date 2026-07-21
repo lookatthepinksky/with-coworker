@@ -20,6 +20,7 @@
 - **Database & Infra:** Supabase (PostgreSQL), Redis (Docker), AWS EC2, AWS SQS, AWS SES
 - **AI Integration:** OpenAI API
 - **CI/CD:** GitHub Actions
+- **AI Pair Programming:** Claude
 
 ---
 
