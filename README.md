@@ -2,7 +2,7 @@
 > **한 달 주기의 가벼운 다면 평가를 통해 팀원들의 빠른 피드백 루프와 성장을 돕는 플랫폼**
 
 - **개발 기간:** 2026.05 ~ 2026.07 (1인 개발)
-- **서비스 링크:** [With Coworkers 바로가기](https://withcoworker.vercel.app)
+- **서비스 링크:** [With Coworkers 바로가기](https://with-coworker.vercel.app)
 - **테스트 계정:** 김수경_AI를 활용한 프로젝트_포트폴리오.pdf 파일 첫페이지 참고
 
 ---
