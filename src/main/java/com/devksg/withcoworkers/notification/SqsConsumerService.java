@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.Message;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -44,12 +47,13 @@ public class SqsConsumerService {
 
     private volatile String queueUrl;
 
-    /**
-     * SQS 메시지 폴링 - 5초 간격, long-poll(20초) 방식으로 효율적 처리
-     * 수신된 메시지는 emailTaskExecutor 스레드 풀에서 비동기 병렬 처리
-     */
+    private static final Set<Integer> POLLING_DAYS = Set.of(1, 5, 7);
+
     @Scheduled(fixedDelay = 5000)
     public void pollAndProcess() {
+        int today = LocalDate.now(ZoneId.of("Asia/Seoul")).getDayOfMonth();
+        if (!POLLING_DAYS.contains(today)) return;
+
         List<Message> messages;
         try {
             messages = sqsClient.receiveMessage(r -> r
