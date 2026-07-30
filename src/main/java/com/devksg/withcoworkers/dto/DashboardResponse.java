@@ -16,7 +16,6 @@ public class DashboardResponse {
     @JsonProperty("isPending")
     private boolean isPending;
     private List<TeammateDto> teammates;
-    private List<ScoreDto> myScores;
 
     @Getter
     @Builder
@@ -24,12 +23,5 @@ public class DashboardResponse {
         private Long id;
         private String name;
         private boolean done;
-    }
-
-    @Getter
-    @Builder
-    public static class ScoreDto {
-        private String label;
-        private double score;
     }
 }
