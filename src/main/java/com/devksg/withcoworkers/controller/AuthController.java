@@ -20,10 +20,13 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
@@ -41,7 +44,7 @@ public class AuthController {
     private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         if (authProviderRepository.findByProviderAndProviderId(ProviderType.LOCAL, request.getLoginId()).isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("message", "존재하지 않는 아이디입니다."));
         }
@@ -54,9 +57,10 @@ public class AuthController {
             loginAttemptService.recordSuccess(request.getLoginId());
             String token = jwtTokenProvider.generateToken(user.getId());
             userSessionService.save(user.getId(), token);
+            setTokenCookie(response, token);
             boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
-            String redirectPath = isExistingMember ? "/dashboard" : "/team-select";
-            return ResponseEntity.ok(Map.of("token", token, "redirectPath", redirectPath));
+            String redirectPath = isExistingMember ? "/team-members/overview" : "/team-select";
+            return ResponseEntity.ok(Map.of("redirectPath", redirectPath));
         } catch (LockedException e) {
             return ResponseEntity.status(429).body(Map.of("message", "로그인 시도 횟수를 초과했습니다. 10분 후 다시 시도해주세요."));
         } catch (BadCredentialsException e) {
@@ -70,11 +74,28 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> logout(@AuthenticationPrincipal User user, HttpServletResponse response) {
         if (user != null) {
             userSessionService.invalidate(user.getId());
         }
+        ResponseCookie cookie = ResponseCookie.from("token", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok(Map.of("message", "로그아웃되었습니다."));
+    }
+
+    private void setTokenCookie(HttpServletResponse response, String token) {
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(jwtTokenProvider.getExpirationSeconds())
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @PostMapping("/signup")

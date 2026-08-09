@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '@api/client'
-import DashboardHeader from '@pages/dashboard/components/DashboardHeader.jsx'
+import AppHeader from '@components/common/AppHeader.jsx'
 import '@styles/evaluate.css'
 
 
@@ -26,7 +26,7 @@ function Evaluate() {
       .then(({ data }) => setName(data.name))
       .catch(() => {
         alert('잘못된 접근입니다.')
-        window.location.href = '/dashboard'
+        window.location.href = '/team-members/overview'
       })
     api.get('/api/evaluation-items').then(({ data }) => setItems(data))
     api.get(`/api/ai/usage?evaluateeId=${id}`)
@@ -88,7 +88,7 @@ function Evaluate() {
         scores: items.map((item) => ({ itemId: item.id, score: scores[item.id] })),
       })
       setSubmitted(true)
-      setTimeout(() => { window.location.href = '/dashboard' }, 1500)
+      setTimeout(() => { window.location.href = '/team-members/overview' }, 1500)
     } catch {
       setSubmitting(false)
     }
@@ -109,11 +109,11 @@ function Evaluate() {
 
   return (
     <>
-      <DashboardHeader />
+      <AppHeader />
       <main className="evaluate-main">
 
         <div className="evaluate-top">
-          <a href="/dashboard" className="btn-back">← 팀원 평가로</a>
+          <a href="/team-members/overview" className="btn-back">← 팀원 평가로</a>
           <div className="evaluate-target">
             <span className="evaluate-avatar">{name ? name[0] : ''}</span>
             <div>

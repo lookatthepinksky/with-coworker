@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -42,19 +44,26 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String token = jwtTokenProvider.generateToken(user.getId());
         userSessionService.save(user.getId(), token);
 
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(jwtTokenProvider.getExpirationSeconds())
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         boolean isApproved = teamMemberRepository.existsByUserIdAndStatus(user.getId(), TeamMemberStatus.APPROVED);
         boolean hasPending = !isApproved && teamMemberRepository.existsByUserId(user.getId());
 
         String redirectPath;
         if (isApproved) {
-            redirectPath = "/dashboard";
+            redirectPath = "/team-members/overview";
         } else if (hasPending) {
             redirectPath = "/team-select?pending=true";
         } else {
             redirectPath = "/team-select";
         }
 
-        String separator = redirectPath.contains("?") ? "&" : "?";
-        response.sendRedirect(frontendUrl + redirectPath + separator + "token=" + token);
+        response.sendRedirect(frontendUrl + redirectPath);
     }
 }

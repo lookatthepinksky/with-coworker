@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 public class ResultSummaryResponse {
     private String period;
-    private long evaluatorCount;
+    private double evaluatorCount;
     private List<ScoreDto> scores;
     private List<CommentDto> comments;
 

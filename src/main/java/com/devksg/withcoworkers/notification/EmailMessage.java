@@ -10,5 +10,5 @@ public record EmailMessage(
         String userName,
         int evaluationYear,
         int evaluationMonth,
-        Long authProviderId  // auth_providers.id, null 허용 (Google 전용 계정 등)
+        Long userId
 ) {}

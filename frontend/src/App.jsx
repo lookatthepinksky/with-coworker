@@ -6,7 +6,7 @@ import Home from './pages/home/Home.jsx'
 import Login from './pages/auth/Login.jsx'
 import Signup from './pages/auth/Signup.jsx'
 import TeamSelect from './pages/auth/TeamSelect.jsx'
-import Dashboard from './pages/dashboard/Dashboard.jsx'
+import TeamMembersOverview from './pages/team-members/Overview.jsx'
 import Result from './pages/result/Result.jsx'
 import Evaluate from './pages/evaluate/Evaluate.jsx'
 import NotFound from './pages/notfound/NotFound.jsx'
@@ -38,7 +38,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/team-select" element={<TeamSelect />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/team-members/overview" element={<ProtectedRoute><TeamMembersOverview /></ProtectedRoute>} />
         <Route path="/result" element={<ProtectedRoute><Result /></ProtectedRoute>} />
         <Route path="/evaluate/:id" element={<ProtectedRoute><Evaluate /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />

@@ -17,8 +17,8 @@ public class NotificationHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "provider_id")
-    private Long providerId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "recipient_email", nullable = false, length = 255)
     private String recipientEmail;
@@ -39,9 +39,9 @@ public class NotificationHistory {
     private LocalDateTime sentAt;
 
     @Builder
-    public NotificationHistory(Long providerId, String recipientEmail, String notificationType,
+    public NotificationHistory(Long userId, String recipientEmail, String notificationType,
                                String subject, String status, String errorMessage) {
-        this.providerId = providerId;
+        this.userId = userId;
         this.recipientEmail = recipientEmail;
         this.notificationType = notificationType;
         this.subject = subject;

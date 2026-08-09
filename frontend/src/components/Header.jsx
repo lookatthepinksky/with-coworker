@@ -9,7 +9,6 @@ function Header() {
     try {
       await api.post('/api/auth/logout')
     } finally {
-      localStorage.removeItem('token')
       window.location.href = '/'
     }
   }
@@ -32,7 +31,7 @@ function Header() {
                 <span className="btn-header-pending">가입 승인 대기중</span>
               ) : (
                 <>
-                  <a href="/dashboard" className="btn-header">팀원 평가</a>
+                  <a href="/team-members/overview" className="btn-header">팀원 평가</a>
                   <a href="/result" className="btn-header">내 평가</a>
                 </>
               )}

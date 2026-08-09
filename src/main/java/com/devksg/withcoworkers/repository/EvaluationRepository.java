@@ -14,12 +14,6 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     boolean existsByEvaluatorAndEvaluateeAndTargetMonth(
         User evaluator, User evaluatee, LocalDate targetMonth);
 
-    @Query("SELECT e.evaluatee.id FROM Evaluation e " +
-        "WHERE e.evaluator = :evaluator AND e.targetMonth = :targetMonth")
-    List<Long> findEvaluateeIdsByEvaluatorAndTargetMonth(
-        @Param("evaluator") User evaluator,
-        @Param("targetMonth") LocalDate targetMonth);
-
     List<Evaluation> findByEvaluatee(User evaluatee);
 
     @Query("""
@@ -39,7 +33,7 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     );
 
     @Query("""
-        SELECT COUNT(DISTINCT e.evaluator.id)
+        SELECT COUNT(e)
         FROM Evaluation e
         WHERE e.evaluatee.id = :userId
           AND e.targetMonth >= :startMonth

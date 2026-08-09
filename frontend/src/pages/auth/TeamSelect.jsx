@@ -13,11 +13,9 @@ function TeamSelect() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const token = params.get('token')
     const pending = params.get('pending')
-    if (token) localStorage.setItem('token', token)
     if (pending === 'true') setMode('pending')
-    if (token || pending) window.history.replaceState({}, '', '/team-select')
+    if (pending) window.history.replaceState({}, '', '/team-select')
   }, [])
 
   useEffect(() => {
@@ -45,7 +43,7 @@ function TeamSelect() {
     setError('')
     try {
       await api.post('/api/teams', { name: newTeamName.trim() })
-      navigate('/dashboard')
+      navigate('/team-members/overview')
     } catch (e) {
       setError(e.response?.data?.message || '팀 생성에 실패했습니다.')
     } finally {

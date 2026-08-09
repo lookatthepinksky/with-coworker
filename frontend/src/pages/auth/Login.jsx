@@ -16,7 +16,6 @@ function Login() {
     setLoading(true)
     try {
       const res = await api.post('/api/auth/login', { loginId, password })
-      localStorage.setItem('token', res.data.token)
       window.location.href = res.data.redirectPath
     } catch (err) {
       if (err.response?.status === 404) {

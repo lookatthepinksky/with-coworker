@@ -18,7 +18,7 @@ function Hero() {
         </p>
         <div className="hero-buttons">
           {loggedIn ? (
-            <a href="/dashboard" className="btn-primary">팀원 평가 시작하기 🚀</a>
+            <a href="/team-members/overview" className="btn-primary">팀원 평가 시작하기 🚀</a>
           ) : (
             <a href="/login" className="btn-primary">로그인하고 시작하기 🚀</a>
           )}

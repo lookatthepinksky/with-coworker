@@ -6,7 +6,7 @@ import {
 import { pdf } from '@react-pdf/renderer'
 import html2canvas from 'html2canvas'
 import ResultPdfDocument from './ResultPdfDocument'
-import DashboardHeader from '@pages/dashboard/components/DashboardHeader.jsx'
+import AppHeader from '@components/common/AppHeader.jsx'
 import api from '@api/client'
 import '@styles/result.css'
 
@@ -28,7 +28,6 @@ function Result() {
   const [summaryData, setSummaryData] = useState(null)
   const [summaryLoading, setSummaryLoading] = useState(true)
   const [trendData, setTrendData] = useState([])
-  const [latestEvaluatorCount, setLatestEvaluatorCount] = useState(null)
   const [trendLoading, setTrendLoading] = useState(true)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [chartReady, setChartReady] = useState(false)
@@ -45,11 +44,6 @@ function Result() {
   }, [trendLoading, summaryLoading])
 
   useEffect(() => {
-    api.get('/api/result/latest-evaluator-count')
-      .then(({ data }) => setLatestEvaluatorCount(data.count))
-  }, [])
-
-  useEffect(() => {
     setSummaryLoading(true)
     setTrendLoading(true)
     setAnimated(false)
@@ -60,7 +54,7 @@ function Result() {
         setTimeout(() => setAnimated(true), 100)
       })
       .finally(() => setSummaryLoading(false))
-    api.get(`/api/result/trend?months=${TAB_MONTHS[activeTab]}`)
+    api.get(`/api/result/monthly-scores?months=${TAB_MONTHS[activeTab]}`)
       .then(({ data }) => setTrendData(data.data ?? []))
       .finally(() => setTrendLoading(false))
   }, [activeTab])
@@ -122,7 +116,6 @@ function Result() {
           trendChartImageUrl={trendChartImageUrl}
           radarChartImageUrl={radarChartImageUrl}
           trendData={trendData}
-          latestEvaluatorCount={latestEvaluatorCount}
         />
       ).toBlob()
 
@@ -145,11 +138,11 @@ function Result() {
           <div className="pdf-loading-spinner" />
         </div>
       )}
-      <DashboardHeader />
+      <AppHeader />
       <main className="result-main">
 
         <div className="page-nav">
-          <a href="/dashboard" className="page-nav-btn">팀원 평가</a>
+          <a href="/team-members/overview" className="page-nav-btn">팀원 평가</a>
           <a href="/result" className="page-nav-btn active">내 평가</a>
         </div>
 
@@ -187,9 +180,9 @@ function Result() {
             </span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">최근 평가 팀원 수</span>
+            <span className="summary-label">월 평균 평가 팀원 수</span>
             <span className="summary-score">
-              {latestEvaluatorCount ?? '-'}<span className="summary-max">명</span>
+              {summaryData?.evaluatorCount ?? '-'}<span className="summary-max">명</span>
             </span>
           </div>
           <div className="summary-card">

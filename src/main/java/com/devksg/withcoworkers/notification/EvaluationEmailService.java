@@ -52,7 +52,7 @@ public class EvaluationEmailService {
     private void saveHistory(EmailMessage message, String subject, String status, String errorMessage) {
         try {
             historyRepository.save(NotificationHistory.builder()
-                    .providerId(message.authProviderId())
+                    .userId(message.userId())
                     .recipientEmail(message.userEmail())
                     .notificationType(message.type().toDbType())
                     .subject(subject)

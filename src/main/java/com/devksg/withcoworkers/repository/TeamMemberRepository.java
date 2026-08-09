@@ -2,11 +2,13 @@ package com.devksg.withcoworkers.repository;
 
 import com.devksg.withcoworkers.domain.TeamMember;
 import com.devksg.withcoworkers.domain.TeamMemberStatus;
+import com.devksg.withcoworkers.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +25,23 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team WHERE tm.user.id = :userId AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.APPROVED")
     Optional<TeamMember> findByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.user WHERE tm.team.id = :teamId AND tm.user.id <> :userId AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.APPROVED")
-    List<TeamMember> findByTeamIdAndUserIdNot(@Param("teamId") Long teamId, @Param("userId") Long userId);
+    @Query("""
+            SELECT tm.user.id, tm.user.name,
+                   CASE WHEN e IS NOT NULL THEN true ELSE false END
+            FROM TeamMember tm
+            LEFT JOIN Evaluation e
+                ON e.evaluator = :evaluator
+                AND e.evaluatee = tm.user
+                AND e.targetMonth = :targetMonth
+            WHERE tm.team.id = :teamId
+            AND tm.user.id <> :myId
+            AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.APPROVED
+            """)
+    List<Object[]> findTeammatesWithEvaluationStatus(
+            @Param("teamId") Long teamId,
+            @Param("myId") Long myId,
+            @Param("evaluator") User evaluator,
+            @Param("targetMonth") LocalDate targetMonth);
 
     @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.user WHERE tm.team.id = :teamId AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.PENDING")
     List<TeamMember> findPendingByTeamId(@Param("teamId") Long teamId);
