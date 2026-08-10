@@ -112,7 +112,7 @@ class AuthControllerLoginLockoutTest {
         given(authenticationManager.authenticate(any())).willReturn(auth);
         // JWT 토큰 생성 Mock
         given(jwtTokenProvider.generateToken(1L)).willReturn("jwt-token");
-        // 팀에 가입된 사용자 → /dashboard로 이동
+        // 팀에 가입된 사용자 → /team-members-overview로 이동
         given(teamMemberRepository.existsByUserId(1L)).willReturn(true);
 
         // --- 실제 요청 수행 및 검증 ---
@@ -121,7 +121,7 @@ class AuthControllerLoginLockoutTest {
                         .content(loginBody(LOGIN_ID, "correctPw")))
                 .andExpect(status().isOk())                              // HTTP 200
                 .andExpect(jsonPath("$.token").value("jwt-token"))       // 토큰 반환 확인
-                .andExpect(jsonPath("$.redirectPath").value("/dashboard")); // 리다이렉트 경로 확인
+                .andExpect(jsonPath("$.redirectPath").value("/team-members/overview")); // 리다이렉트 경로 확인
 
         // 로그인 성공 시 실패 카운트를 초기화해야 하고, 실패 기록은 하면 안 됨
         verify(loginAttemptService).recordSuccess(LOGIN_ID);
