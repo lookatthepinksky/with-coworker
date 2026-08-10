@@ -99,7 +99,7 @@ function TeamMembersOverview() {
   }
 
   const handleReject = async (teamMemberId) => {
-    await api.delete(/api`/teams/members/${teamMemberId}`)
+    await api.delete(/api/teams/members/${teamMemberId}`)
     const updated = pendingMembers.filter((m) => m.teamMemberId !== teamMemberId)
     setPendingMembers(updated)
     if (updated.length === 0) setShowPendingModal(false)
