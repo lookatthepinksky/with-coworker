@@ -55,83 +55,32 @@
 
 ## 🧠 트러블 슈팅 (Troubleshooting & Architecture Decisions)
 
-### 1️⃣ SPA(Single Page Application) 배포 시 서브 경로 라우팅 404 에러 해결
-* **상황(Situation):** React로 개발한 프론트엔드를 Vercel 플랫폼에 배포한 후, `/login` 등의 특정 서브 경로로 브라우저 주소창에 직접 입력하여 접속할 때 **404 Not Found** 에러가 발생했습니다.
-* **원인(Problem):** React는 Single Page Application(SPA) 구조로 클라이언트 사이드 라우팅을 수행합니다. 하지만 Vercel은 정적 호스팅 서버이기 때문에 사용자가 `/login`을 직접 입력하면 서버에서 해당 이름의 물리적 파일이나 폴더를 찾으려고 시도하여 "존재하지 않는 파일"로 오인하는 것이 원인이었습니다.
-* **해결(Action):** Vercel 설정을 제어하는 `vercel.json` 파일을 프론트엔드 루트 폴더에 추가하고, 모든 경로의 요청(`/(.*)`)을 루트 인덱스 파일(`/index.html`)로 리다이렉트(`rewrites`)하도록 규칙을 정의했습니다.
-  ```json
-  {
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/index.html" }
-    ]
-  }
-  ```
-* **결과(Result):** 사용자가 어떤 경로로 직접 접속하더라도 서버가 일단 `index.html`을 안전하게 반환하도록 보장했으며, 그 직후 브라우저 내의 React Router가 URL을 정상적으로 인식하여 로그인 화면을 매끄럽게 그려내도록 해결했습니다.
+### 1️⃣ AWS EC2 프리 티어 환경의 메모리 고갈로 인한 서버 다운 해결 (Swap Memory)
+* **상황(Situation):** 프로젝트 배포를 완료한 직후, 잘 작동하던 시스템 API 호출 시 간헐적으로 502 Bad Gateway 에러가 발생하며 웹 서비스가 마비되는 현상이 발생하였습니다. EC2 인스턴스 확인 결과, 운영 중이던 백엔드 애플리케이션(Spring Boot) 프로세스가 비정상적으로 종료(Exit(137))되어 있는 상태였습니다.
+* **원인(Problem):** 요청을 가장 앞단에서 중재하는 리버스 프록시인 NGINX의 시스템 에러 로그(/var/log/nginx/error.log)를 추적 및 분석했습니다. 분석 결과, 백엔드 컨테이너로 연결이 실패했다는 로그와 함께 OS 레벨에서 OOM(Out Of Memory) 커널 킬러에 의해 Spring Boot 프로세스가 강제 강등 및 종료된 로그를 발견했습니다. AWS t3.micro 프리티어 인스턴스의 제한된 가용 물리 메모리(RAM 1GB) 환경에서 시스템을 구동하다가 물리적 한계 용량을 초과하여 발생한 아키텍처 리소스 고갈 문제였습니다.
+* **해결(Action):** 비용적인 한계 내에서 무료 프리티어 인스턴스를 유지하면서도 시스템을 안정화할 수 있는 리눅스 OS 레벨의 아키텍처 대안인 스왑 메모리(Swap Space) 배치를 결정했습니다. EC2 시스템의 루트 볼륨 SSD 하드디스크 공간 중 2GB를 임시 가상 메모리로 차용하도록 스왑 파일을 생성하고 등록했습니다. 물리 메모리 용량이 부족해질 때 사용 빈도가 낮은 메모리 페이지를 하드디스크 영역으로 Swap-out 시켜 RAM 공간을 확보하는 최적화를 인프라 명령어를 통해 영구 적용했습니다.
+* **결과(Result):** 가용 가상 메모리가 물리 1GB에서 논리 총 3GB(RAM 1GB + Swap 2GB) 수준으로 여유 있게 늘어났습니다. 컨테이너가 장시간 구동되더라도 OOM 현상 및 프로세스 셧다운이 완전히 사라졌으며, 502 Bad Gateway 에러 없이 서버가 24시간 안정적으로 가동되는 인프라 회복 탄력성을 확보했습니다.
 
 ---
 
-### 2️⃣ Mixed Content 및 CORS 차단을 해결하기 위한 Vercel Reverse Proxy 구축
-* **상황(Situation):** HTTPS 보안 프로토콜이 적용된 Vercel 프론트엔드에서 HTTP 환경인 AWS EC2 백엔드 API 서버로 로그인 및 데이터 요청을 보낼 때, **405 Method Not Allowed** 및 **CORS 보안 제한 에러**가 발생했습니다.
-* **원인(Problem):** 
-  1. 현대 웹 브라우저는 보안 상 **Mixed Content(HTTPS 사이트에서 HTTP API를 호출하는 행위)**를 엄격히 차단합니다.
-  2. 프론트엔드와 백엔드의 도메인이 완전히 달라 브라우저의 **CORS(Cross-Origin Resource Sharing) 제한**에 걸렸습니다.
-  3. 인프라 측면에서 EC2 서버가 재부팅될 때마다 유동 IP가 계속 변경되어 통신 엔드포인트가 깨지는 문제가 복합적으로 존재했습니다.
-* **해결(Action):** 
-  1. **AWS 탄력적 IP(Elastic IP) 할당:** EC2 인스턴스에 고정 IPv4 주소를 매핑하여 인프라의 주소 안정성을 확보했습니다.
-  2. **Vercel Reverse Proxy 설정:** 백엔드에 직접 SSL을 적용하기 전 임시 우회책으로, 브라우저가 EC2와 직접 통신하지 않고 **Vercel 호스팅 서버가 백엔드와 대신 HTTP 통신을 수행**하도록 `vercel.json`에 리버스 프록시 라우팅을 구현했습니다.
-  ```json
-  {
-    "rewrites": [
-      { "source": "/api/:path*", "destination": "http://<고정_EC2_IP>:8080/api/:path*" },
-      { "source": "/oauth2/:path*", "destination": "http://<고정_EC2_IP>:8080/oauth2/:path*" },
-      { "source": "/login/oauth2/:path*", "destination": "http://<고정_EC2_IP>:8080/login/oauth2/:path*" },
-      { "source": "/logout", "destination": "http://<고정_EC2_IP>:8080/logout" },
-      { "source": "/(.*)", "destination": "/index.html" }
-    ]
-  }
-  ```
-* **결과(Result):** 
-  * 브라우저와 Vercel 구간은 자물쇠가 채워진 안전한 HTTPS 통신을 유지하고, 서버 대 서버 영역에서 HTTP 연동을 처리하여 Mixed Content 문제를 우회 해결했습니다.
-  * 프론트엔드와 백엔드가 외견상 **동일한 도메인 아래에서 동작하는 것처럼 통일감**을 주어 별도의 CORS 설정 부담을 줄였으며, 실제 백엔드 EC2 주소를 클라이언트 환경에 노출하지 않는 보안 이점까지 확보했습니다.
+### 2️⃣ Mixed Content 차단과 CORS 오류 해결을 위한 Vercel Reverse Proxy 구축
+* **상황(Situation):** HTTPS 보안 프로토콜이 적용된 Vercel 프론트엔드에서 HTTP 환경인 AWS EC2 백엔드 API 서버로 로그인 및 데이터 요청을 보낼 때, 브라우저 보안 제약으로 인해 API 호출이 차단되는 현상이 발생했습니다.
+* **원인(Problem):**
+  1. **Mixed Content 차단:** 현대 웹 브라우저는 보안상 HTTPS 프로토콜로 서빙되는 사이트에서 안전하지 않은 HTTP API를 호출하는 행위를 엄격히 차단합니다.
+  2. **CORS(Cross-Origin Resource Sharing) 제한:** 프론트엔드 배포 도메인과 백엔드 EC2의 도메인이 달라 브라우저의 교차 출처 자원 공유 제한에 걸렸습니다.
+* **해결(Action):**
+  1. **Vercel Reverse Proxy 설정:** 백엔드에 SSL을 적용하지 않았기 때문에 브라우저가 EC2와 직접 통신하지 않고 Vercel 호스팅 서버가 백엔드와 대신 HTTP 통신을 수행하도록 `vercel.json`에 리버스 프록시 라우팅을 구현했습니다.
+  2. **AWS 탄력적 IP(Elastic IP) 할당:** EC2 인스턴스에 고정 IPv4 주소를 매핑하여 인프라의 주소 안정성을 확보했습니다.
+* **결과(Result):**
+  * **Mixed Content 문제 해소:** 브라우저–Vercel 구간은 HTTPS 통신을, Vercel–EC2 구간은 서버 간 HTTP 통신을 각각 유지하게 되어, 브라우저의 보안 정책에 저촉되지 않고 API 요청이 정상적으로 처리됩니다.
+  * **CORS 문제 해소:** 프론트엔드와 백엔드의 모든 요청이 Vercel 도메인 하나로 통합되어, 브라우저가 이를 동일 출처로 인식하면서 별도의 CORS 설정 없이도 교차 출처 요청이 자유롭게 오가게 되었습니다.
 
 ---
 
 ### 3️⃣ GitHub Actions 비대화형(Non-interactive) 모드에 따른 환경변수 주입 실패 해결
-* **상황(Situation):** GitHub Actions 워크풀로우를 통해 운영 서버 자동 배포(`docker-compose up`)를 진행했을 때, 백엔드 컨테이너가 시스템의 필수 환경 변수들을 읽어오지 못해 구동 에러가 발생했습니다.
+* **상황(Situation):** GitHub Actions 워크플로우를 통해 운영 서버 자동 배포(`docker compose up`)를 진행했을 때, 백엔드 컨테이너가 시스템의 필수 환경 변수들을 읽어오지 못해 구동 에러가 발생했습니다.
 * **원인(Problem):** GitHub Actions 러너가 SSH를 통해 배포 서버에 접속할 때는 **비대화형(Non-interactive) 및 비로그인(Non-login) 쉘 모드**로 명령을 실행합니다. 이 때문에 운영 서버의 로컬 환경 변수가 등록된 `~/.bashrc` 파일이 자동으로 로드되지 않아 변수들을 식별할 수 없었던 것이 원인이었습니다.
-* **해결(Action):** 외부 실행 환경에 의존하지 않는 안전한 배포를 위해, Docker Compose의 내장 메커니즘을 활용하기로 결정했습니다. EC2 백엔드 프로젝트 루트 경로에 **`.env` 파일**을 직접 생성하고 실행에 필요한 환경 변수들을 명시해 두었습니다.
-* **결과(Result):** `docker-compose` 명령어가 구동될 때 현재 폴더 내부의 `.env` 파일을 자동으로 검색하여 변수를 주입하는 규칙 덕분에, GitHub Actions의 실행 모드와 관계없이 컨테이너 내부로 필요한 환경 변수들이 안전하고 일관되게 주입되도록 자동화 인프라를 보완했습니다.
-
----
-
-
-### 4️⃣ AWS EC2 프리 티어 환경의 메모리 고갈로 인한 서버 다운 해결 (Swap Memory)
-* **상황(Situation):** 프로젝트 배포를 완료한 직후, 잘 작동하던 시스템 API 호출 시 간헐적으로 502 Bad Gateway 에러가 발생하며 웹 서비스가 완전히 마비되는 현상이 관측되었습니다. EC2 인스턴스 확인 결과, 운영 중이던 백엔드 애플리케이션(Spring Boot) 프로세스가 비정상적으로 종료(Exit(137))되어 있는 상태였습니다.
-* **원인(Problem):**  요청을 가장 앞단에서 중재하는 리버스 프록시인 NGINX의 시스템 에러 로그(/var/log/nginx/error.log)를 추적 및 분석했습니다. 분석 결과, 백엔드 컨테이너로 연결이 실패했다는 로그와 함께 OS 레벨에서 OOM(Out Of Memory) 커널 킬러에 의해 Spring Boot 프로세스가 강제 강등 및 종료된 흔적을 발견했습니다. AWS t3.micro 프리티어 인스턴스의 제한된 가용 물리 메모리(RAM 1GB) 환경에서 Spring Boot, NGINX, Redis를 동시에 Docker 컨테이너로 구동하다가 물리적 한계 용량을 초과하여 발생한 아키텍처 리소스 고갈 문제였습니다.
-* **해결(Action):** 비용적인 한계 내에서 무료 프리티어 인스턴스를 유지하면서도 시스템을 안정화할 수 있는 리눅스 OS 레
-  벨의 아키텍처 대안인 스왑 메모리(Swap Space) 배치를 결정했습니다.
-  EC2 시스템의 루트 볼륨 SSD 하드디스크 공간 중 2GB를 임시 가상 메모리로 차용하도록 스왑 파일을 생
-  성하고 등록했습니다. 물리 메모리 용량이 부족해질 때 사용 빈도가 낮은 메모리 페이지를 하드디스크 영
-  역으로 Swap-out 시켜 RAM 공간을 확보하는 최적화를 인프라 명령어를 통해 영구 적용했습니다.
-  ```bash
-  # 1. 2GB 크기의 스왑 파일 생성
-  sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
-  
-  # 2. 파일 권한 설정 (보안)
-  sudo chmod 600 /swapfile
-
-   # 3. 스왑 공간으로 포맷
-   sudo mkswap /swapfile
-
-   # 4. 스왑 파일 활성화
-   sudo swapon /swapfile
-
-   # 5. 서버가 재부팅되어도 유지되도록 등록
-   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-   ```
-* **결과(Result):** 가용 가상 메모리가 물리 1GB에서 논리 총 3GB(RAM 1GB + Swap 2GB) 수준으로 여유 있게 늘어났습
-  니다. 이후 다수의 컨테이너가 장시간 구동되거나 일시적인 트래픽 및 백엔드 연동 부하가 걸리더라도
-  OOM 현상 및 프로세스 셧다운이 완전히 사라졌으며, 502 Bad Gateway 에러 없이 서버가 24시간 안정
-  적으로 가동되는 인프라 회복 탄력성을 확보했습니다
+* **해결(Action):** 외부 실행 환경에 의존하지 않는 안전한 배포를 위해, Docker Compose의 내장 메커니즘을 활용하기로 결정했습니다. EC2 백엔드 프로젝트 루트 경로에 `.env` 파일을 직접 생성하고 실행에 필요한 환경 변수들을 명시해 두었습니다.
+* **결과(Result):** `docker compose` 명령어가 구동될 때 현재 폴더 내부의 `.env` 파일을 자동으로 검색하여 변수를 주입하는 규칙 덕분에, GitHub Actions의 실행 모드와 관계없이 컨테이너 내부로 필요한 환경 변수들이 안전하고 일관되게 주입되도록 자동화 인프라를 보완했습니다.
 
 ---
