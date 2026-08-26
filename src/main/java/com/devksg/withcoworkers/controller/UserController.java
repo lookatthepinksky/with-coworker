@@ -35,7 +35,7 @@ public class UserController {
 
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal User user) {
-        userRepository.delete(user);
+        userRepository.deleteById(user.getId());
         return ResponseEntity.noContent().build();
     }
 }

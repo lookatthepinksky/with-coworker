@@ -6,11 +6,11 @@ import com.devksg.withcoworkers.domain.EvaluationScore;
 import com.devksg.withcoworkers.domain.TeamMemberStatus;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.dto.EvaluationRequest;
-import com.devksg.withcoworkers.repository.EvaluationItemRepository;
 import com.devksg.withcoworkers.repository.EvaluationRepository;
 import com.devksg.withcoworkers.repository.EvaluationScoreRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -31,9 +32,10 @@ public class EvaluationService {
 
     private final EvaluationRepository evaluationRepository;
     private final EvaluationScoreRepository evaluationScoreRepository;
-    private final EvaluationItemRepository evaluationItemRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final EntityManager em;
     private final UserRepository userRepository;
+    private final UserTeamCacheService userTeamCacheService;
 
     public Map<String, String> getEvaluateTarget(User evaluator, Long targetId) {
         LocalDate targetMonth = YearMonth.now().minusMonths(1).atDay(1);
@@ -50,20 +52,11 @@ public class EvaluationService {
 
         User evaluatee = userRepository.findById(request.getEvaluateeId()).orElseThrow();
 
-        if (evaluator.getId().equals(evaluatee.getId())) {
-            throw new IllegalStateException("자기 자신은 평가할 수 없습니다.");
-        }
+        Long myTeamId = userTeamCacheService.getTeamId(evaluator.getId())
+                .orElseThrow(() -> new IllegalStateException("팀 정보를 찾을 수 없습니다."));
 
-        Long myTeamId = teamMemberRepository.findByUserId(evaluator.getId())
-                .orElseThrow(() -> new IllegalStateException("팀에 소속되어 있지 않습니다."))
-                .getTeam().getId();
-
-        if (!teamMemberRepository.existsByTeamIdAndUserId(myTeamId, evaluatee.getId())) {
-            throw new IllegalStateException("같은 팀 팀원만 평가할 수 있습니다.");
-        }
-
-        if (evaluationRepository.existsByEvaluatorAndEvaluateeAndTargetMonth(evaluator, evaluatee, targetMonth)) {
-            throw new IllegalStateException("이미 해당 월에 평가를 완료했습니다.");
+        if (!teamMemberRepository.existsValidEvaluatee(myTeamId, evaluatee.getId(), evaluator.getId())) {
+            throw new IllegalStateException("잘못된 피평가자입니다.");
         }
 
         Evaluation evaluation;
@@ -80,15 +73,13 @@ public class EvaluationService {
             throw new IllegalStateException("이미 해당 월에 평가를 완료했습니다.");
         }
 
-        for (EvaluationRequest.ScoreItem scoreItem : request.getScores()) {
-            EvaluationItem item = evaluationItemRepository.findById(scoreItem.getItemId()).orElseThrow();
-            evaluationScoreRepository.save(
-                EvaluationScore.builder()
-                    .evaluation(evaluation)
-                    .item(item)
-                    .score(scoreItem.getScore())
-                    .build()
-            );
-        }
+        List<EvaluationScore> scores = request.getScores().stream()
+                .map(scoreItem -> EvaluationScore.builder() //스트림의 .map(scoreItem -> ...) 이 for문의 for (ScoreItem scoreItem : ...) 랑 같은 역할
+                        .evaluation(evaluation)
+                        .item(em.getReference(EvaluationItem.class, scoreItem.getItemId())) //em.getReference <- EntiryManager의 메서드. DB조회 없이 프록시 객체를 만들어 줌
+                        .score(scoreItem.getScore())
+                        .build())
+                .toList();
+        evaluationScoreRepository.saveAll(scores);
     }
 }

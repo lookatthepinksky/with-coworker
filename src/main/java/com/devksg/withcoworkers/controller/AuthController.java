@@ -10,8 +10,10 @@ import com.devksg.withcoworkers.dto.SignupRequest;
 import com.devksg.withcoworkers.repository.AuthProviderRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
+import com.devksg.withcoworkers.domain.TeamMemberRole;
 import com.devksg.withcoworkers.service.LoginAttemptService;
 import com.devksg.withcoworkers.service.UserSessionService;
+import com.devksg.withcoworkers.service.UserTeamCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,6 +44,7 @@ public class AuthController {
     private final UserSessionService userSessionService;
     private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
+    private final UserTeamCacheService userTeamCacheService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
@@ -58,6 +61,11 @@ public class AuthController {
             String token = jwtTokenProvider.generateToken(user.getId());
             userSessionService.save(user.getId(), token);
             setTokenCookie(response, token);
+            var approvedMember = teamMemberRepository.findByUserId(user.getId());
+            Long teamId = approvedMember.map(m -> m.getTeam().getId()).orElse(null);
+            String teamName = approvedMember.map(m -> m.getTeam().getName()).orElse(null);
+            boolean isAdmin = approvedMember.map(m -> m.getRole() == TeamMemberRole.ADMIN).orElse(false);
+            userTeamCacheService.saveUserInfo(user.getId(), user.getName(), user.getEmail(), teamId, teamName, isAdmin);
             boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
             String redirectPath = isExistingMember ? "/team-members/overview" : "/team-select";
             return ResponseEntity.ok(Map.of("redirectPath", redirectPath));

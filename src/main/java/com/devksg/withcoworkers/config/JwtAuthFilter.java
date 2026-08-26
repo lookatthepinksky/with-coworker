@@ -1,7 +1,9 @@
 package com.devksg.withcoworkers.config;
 
+import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.repository.UserRepository;
 import com.devksg.withcoworkers.service.UserSessionService;
+import com.devksg.withcoworkers.service.UserTeamCacheService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final UserSessionService userSessionService;
+    private final UserTeamCacheService userTeamCacheService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -41,12 +44,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {//OncePerRequestFilter 
                 return;
             }
 
-            userRepository.findById(userId).ifPresent(user -> {
+            User user = userTeamCacheService.getUserInfo(userId)
+                    .map(info -> new User(userId, (String) info.get("name"), (String) info.get("email")))
+                    .orElseGet(() -> userRepository.findById(userId).orElse(null));
+
+            if (user != null) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            }
         }
 
         filterChain.doFilter(request, response);

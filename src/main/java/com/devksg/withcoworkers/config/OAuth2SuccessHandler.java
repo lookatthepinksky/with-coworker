@@ -1,11 +1,11 @@
 package com.devksg.withcoworkers.config;
 
 import com.devksg.withcoworkers.domain.ProviderType;
-import com.devksg.withcoworkers.domain.TeamMemberStatus;
 import com.devksg.withcoworkers.domain.User;
 import com.devksg.withcoworkers.repository.AuthProviderRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.service.UserSessionService;
+import com.devksg.withcoworkers.service.UserTeamCacheService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final TeamMemberRepository teamMemberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserSessionService userSessionService;
+    private final UserTeamCacheService userTeamCacheService;
 
     @Override
     @Transactional
@@ -52,7 +53,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        boolean isApproved = teamMemberRepository.existsByUserIdAndStatus(user.getId(), TeamMemberStatus.APPROVED);
+        var approvedMember = teamMemberRepository.findByUserId(user.getId());
+        boolean isApproved = approvedMember.isPresent();
+
+        Long teamId = isApproved ? approvedMember.get().getTeam().getId() : null;
+        String teamName = isApproved ? approvedMember.get().getTeam().getName() : null;
+        boolean isAdmin = isApproved && approvedMember.get().getRole() == com.devksg.withcoworkers.domain.TeamMemberRole.ADMIN;
+        userTeamCacheService.saveUserInfo(user.getId(), user.getName(), user.getEmail(), teamId, teamName, isAdmin);
+
         boolean hasPending = !isApproved && teamMemberRepository.existsByUserId(user.getId());
 
         String redirectPath;

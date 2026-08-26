@@ -16,6 +16,18 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
 
     boolean existsByTeamIdAndUserId(Long teamId, Long userId);
 
+    @Query("""
+            SELECT CASE WHEN COUNT(tm) > 0 THEN true ELSE false END
+            FROM TeamMember tm
+            WHERE tm.team.id = :teamId
+            AND tm.user.id = :evaluateeId
+            AND tm.user.id != :evaluatorId
+            AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.APPROVED
+            """)
+    boolean existsValidEvaluatee(@Param("teamId") Long teamId,
+                                 @Param("evaluateeId") Long evaluateeId,
+                                 @Param("evaluatorId") Long evaluatorId);
+
     boolean existsByTeamIdAndUserIdAndStatus(Long teamId, Long userId, TeamMemberStatus status);
 
     boolean existsByUserId(Long userId);

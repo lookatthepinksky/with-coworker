@@ -22,26 +22,44 @@ public class TeamMemberService {
     private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 
     private final TeamMemberRepository teamMemberRepository;
+    private final UserTeamCacheService userTeamCacheService;
 
     @Transactional(readOnly = true)
     public TeamMemberOverviewResponse getTeamMembersOverview(User me, String targetMonth) {
         LocalDate target = YearMonth.parse(targetMonth, MONTH_FORMATTER).atDay(1);
 
-        TeamMember myMembership = teamMemberRepository.findByUserId(me.getId()).orElse(null);
+        // Redis에서 teamId/teamName/isAdmin 조회 → 있으면 findByUserId DB 쿼리 생략
+        var cached = userTeamCacheService.getUserInfo(me.getId()).orElse(null);
+        Long teamId = null;
+        String teamName = null;
+        boolean isAdmin = false;
 
-        TeamMember pendingMembership = myMembership == null
-                ? teamMemberRepository.findPendingMembershipByUserId(me.getId()).orElse(null)
-                : null;
-        boolean isPending = pendingMembership != null;
+        if (cached != null && cached.containsKey("teamId")) {
+            teamId = Long.parseLong((String) cached.get("teamId"));
+            teamName = (String) cached.get("teamName");
+            isAdmin = Boolean.parseBoolean((String) cached.get("isAdmin"));
+        } else {
+            TeamMember myMembership = teamMemberRepository.findByUserId(me.getId()).orElse(null);
+            if (myMembership != null) {
+                teamId = myMembership.getTeam().getId();
+                teamName = myMembership.getTeam().getName();
+                isAdmin = myMembership.getRole() == TeamMemberRole.ADMIN;
+            }
+        }
 
-        String teamName = myMembership != null ? myMembership.getTeam().getName()
-                : (pendingMembership != null ? pendingMembership.getTeam().getName() : null);
-        boolean isAdmin = myMembership != null && myMembership.getRole() == TeamMemberRole.ADMIN;
+        boolean isPending = false;
+        if (teamId == null) {
+            TeamMember pendingMembership = teamMemberRepository.findPendingMembershipByUserId(me.getId()).orElse(null);
+            isPending = pendingMembership != null;
+            if (pendingMembership != null) {
+                teamName = pendingMembership.getTeam().getName();
+            }
+        }
 
-        List<TeamMemberOverviewResponse.TeammateDto> teammates = myMembership == null
+        List<TeamMemberOverviewResponse.TeammateDto> teammates = teamId == null
                 ? Collections.emptyList()
                 : teamMemberRepository
-                .findTeammatesWithEvaluationStatus(myMembership.getTeam().getId(), me.getId(), me, target)
+                .findTeammatesWithEvaluationStatus(teamId, me.getId(), me, target)
                 .stream()
                 .map(row -> TeamMemberOverviewResponse.TeammateDto.builder()
                         .id((Long) row[0])

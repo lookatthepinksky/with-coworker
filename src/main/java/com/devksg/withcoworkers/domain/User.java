@@ -33,4 +33,10 @@ public class User {
         this.name = name;
         this.createdAt = LocalDateTime.now();
     }
+
+    public User(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 }
