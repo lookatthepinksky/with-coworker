@@ -4,18 +4,27 @@ import com.devksg.withcoworkers.domain.AiUsingCount;
 import com.devksg.withcoworkers.domain.AiUsingCountLog;
 import com.devksg.withcoworkers.repository.AiUsingCountLogRepository;
 import com.devksg.withcoworkers.repository.AiUsingCountRepository;
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.errors.APIConnectionException;
+import com.openai.errors.AuthenticationException;
+import com.openai.errors.OpenAIException;
+import com.openai.errors.RateLimitException;
+import com.openai.models.ChatCompletionCreateParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class AiService {
+
+    private static final Logger log = LoggerFactory.getLogger(AiService.class);
 
     @Value("${ai.usage.limit:5}")
     private int aiUsageLimit;
@@ -29,8 +38,8 @@ public class AiService {
         [가장 중요한 규칙 - 반드시 준수]
         출력 결과의 글자 수(공백 포함)가 반드시 150자 이하여야 합니다.
         작성 후 글자 수를 직접 세어 확인하고, 150자를 초과하면 반드시 다시 작성하세요.
-        
-        
+
+
 
         [내용 규칙]
         - 입력값은 반드시 사용자가 직접 작성한 평가 코멘트 원문이어야 합니다.
@@ -49,7 +58,7 @@ public class AiService {
         - 결과 문장이 총 몇 자 인지 적어주면 안됨
         """;
 
-    private final RestClient restClient;
+    private final OpenAIClient openAIClient;
 
     @Autowired
     private AiUsingCountRepository aiUsingCountRepository;
@@ -58,9 +67,10 @@ public class AiService {
     private AiUsingCountLogRepository aiUsingCountLogRepository;
 
     public AiService(@Value("${openai.api.key}") String apiKey) {
-        this.restClient = RestClient.builder()
-            .baseUrl("https://api.openai.com")
-            .defaultHeader("Authorization", "Bearer " + apiKey)
+        this.openAIClient = OpenAIOkHttpClient.builder()
+            .apiKey(apiKey)
+            .connectTimeout(Duration.ofSeconds(5))
+            .readTimeout(Duration.ofSeconds(15))
             .build();
     }
 
@@ -111,34 +121,33 @@ public class AiService {
 
     private String callOpenAi(String comment) {
         try {
-            Map<String, Object> body = Map.of(
-                "model", "gpt-4.1-mini",
-                "messages", List.of(
-                    Map.of("role", "system", "content", SYSTEM_PROMPT),
-                    Map.of("role", "user", "content", comment)
-                ),
-                "max_tokens", 300
+            var completion = openAIClient.chat().completions().create(
+                ChatCompletionCreateParams.builder()
+                    .model("gpt-4.1-mini")
+                    .addSystemMessage(SYSTEM_PROMPT)
+                    .addUserMessage(comment)
+                    .maxTokens(300)
+                    .build()
             );
 
-            ChatResponse response = restClient.post()
-                .uri("/v1/chat/completions")
-                .header("Content-Type", "application/json")
-                .body(body)
-                .retrieve()
-                .body(ChatResponse.class);
-
-            if (response == null || response.choices() == null || response.choices().isEmpty()) {
+            String content = completion.choices().get(0).message().content().orElse(null);
+            if (content == null || content.isBlank()) {
                 throw new AiServiceUnavailableException();
             }
-            return response.choices().get(0).message().content().strip();
-        } catch (AiServiceUnavailableException | AiCreditExceededException e) {
+            return content.strip();
+        } catch (AiServiceUnavailableException | AiCreditExceededException | AiTimeoutException | AiAuthException e) {
             throw e;
-        } catch (org.springframework.web.client.HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 429) {
-                throw new AiCreditExceededException();
-            }
-            throw new AiServiceUnavailableException();
-        } catch (Exception e) {
+        } catch (RateLimitException e) {
+            // OpenAI 계정 크레딧 소진 (429)
+            throw new AiCreditExceededException();
+        } catch (AuthenticationException e) {
+            // API 키 인증 실패 (401) - 운영자 확인 필요
+            log.error("[AI AUTH ERROR] OpenAI API 키 인증 실패. 키 만료 또는 잘못된 키 확인 필요. status=401");
+            throw new AiAuthException();
+        } catch (APIConnectionException e) {
+            // 타임아웃 또는 네트워크 단절
+            throw new AiTimeoutException();
+        } catch (OpenAIException e) {
             throw new AiServiceUnavailableException();
         }
     }
@@ -161,7 +170,15 @@ public class AiService {
         }
     }
 
-    private record ChatResponse(List<Choice> choices) {}
-    private record Choice(Message message) {}
-    private record Message(String content) {}
+    public static class AiTimeoutException extends RuntimeException {
+        public AiTimeoutException() {
+            super("AI_TIMEOUT");
+        }
+    }
+
+    public static class AiAuthException extends RuntimeException {
+        public AiAuthException() {
+            super("AI_AUTH_ERROR");
+        }
+    }
 }
