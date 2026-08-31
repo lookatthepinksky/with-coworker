@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import api from '@api/client'
 import AppHeader from '@components/common/AppHeader.jsx'
 import '@styles/evaluate.css'
@@ -113,7 +113,7 @@ function Evaluate() {
       <main className="evaluate-main">
 
         <div className="evaluate-top">
-          <a href="/team-members/overview" className="btn-back">← 팀원 평가로</a>
+          <Link to="/team-members/overview" className="btn-back">← 팀원 평가로</Link>
           <div className="evaluate-target">
             <span className="evaluate-avatar">{name ? name[0] : ''}</span>
             <div>

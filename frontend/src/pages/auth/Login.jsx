@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import api from '@api/client'
 import '@styles/login.css'
 
@@ -31,7 +31,7 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <a href="/" className="login-logo">🧑‍💻 WithCoworker</a>
+        <Link to="/" className="login-logo">🧑‍💻 WithCoworker</Link>
         <h1 className="login-title">안녕하세요 👋</h1>
         <p className="login-desc">계정으로 로그인하거나 구글로 시작하세요</p>
 

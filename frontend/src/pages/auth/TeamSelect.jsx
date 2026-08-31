@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import api from '@api/client'
 
 function TeamSelect() {
@@ -55,16 +55,16 @@ function TeamSelect() {
     return (
       <div className="team-select-page">
         <div className="team-select-card">
-          <a href="/" className="login-logo">🧑‍💻 WithCoworker</a>
+          <Link to="/" className="login-logo">🧑‍💻 WithCoworker</Link>
           <div style={{ fontSize: '3rem', marginBottom: '16px' }}>⏳</div>
           <h1 className="team-select-title">승인 대기 중이에요</h1>
           <p className="team-select-desc">
             팀장이 가입 요청을 확인 중이에요.<br />
             승인되면 로그인 후 바로 시작할 수 있어요!
           </p>
-          <a href="/" className="btn-confirm" style={{ textAlign: 'center', display: 'block', lineHeight: '1' }}>
+          <Link to="/" className="btn-confirm" style={{ textAlign: 'center', display: 'block', lineHeight: '1' }}>
             홈으로
-          </a>
+          </Link>
         </div>
       </div>
     )
@@ -74,7 +74,7 @@ function TeamSelect() {
     return (
       <div className="team-select-page">
         <div className="team-select-card">
-          <a href="/" className="login-logo">🧑‍💻 WithCoworker</a>
+          <Link to="/" className="login-logo">🧑‍💻 WithCoworker</Link>
           <h1 className="team-select-title">팀 만들기</h1>
           <p className="team-select-desc">새 팀을 만들고 팀원을 초대해보세요</p>
 

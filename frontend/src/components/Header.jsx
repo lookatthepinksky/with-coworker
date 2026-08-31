@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import api from '@api/client'
 import { useUser } from '@context/UserContext.jsx'
 import '@styles/header.css'
@@ -16,10 +17,10 @@ function Header() {
   return (
     <header className="header">
       <div className="header-inner">
-        <a href="/" className="logo">
+        <Link to="/" className="logo">
           <span className="logo-emoji">🧑‍💻</span>
           WithCoworkers
-        </a>
+        </Link>
         <nav className="nav">
           <a href="#features">기능</a>
           <a href="#how-it-works">사용법</a>
@@ -31,14 +32,14 @@ function Header() {
                 <span className="btn-header-pending">가입 승인 대기중</span>
               ) : (
                 <>
-                  <a href="/team-members/overview" className="btn-header">팀원 평가</a>
-                  <a href="/result" className="btn-header">내 평가</a>
+                  <Link to="/team-members/overview" className="btn-header">팀원 평가</Link>
+                  <Link to="/result" className="btn-header">내 평가</Link>
                 </>
               )}
               <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
             </>
           ) : (
-            <a href="/login" className="btn-signup">로그인</a>
+            <Link to="/login" className="btn-signup">로그인</Link>
           )}
         </div>
       </div>

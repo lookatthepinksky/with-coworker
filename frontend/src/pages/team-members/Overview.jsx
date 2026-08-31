@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import api from '@api/client'
 import AppHeader from '@components/common/AppHeader.jsx'
 import '@styles/dashboard.css'
@@ -130,8 +130,8 @@ function TeamMembersOverview() {
       <main className="dashboard-main">
 
         <div className="page-nav">
-          <a href="/team-members/overview" className="page-nav-btn active">팀원 평가</a>
-          <a href="/result" className="page-nav-btn">내 평가</a>
+          <Link to="/team-members/overview" className="page-nav-btn active">팀원 평가</Link>
+          <Link to="/result" className="page-nav-btn">내 평가</Link>
         </div>
 
         <div className="dashboard-greeting">
@@ -191,7 +191,7 @@ function TeamMembersOverview() {
                   {t.done ? (
                     <span className="badge-done">완료 ✓</span>
                   ) : (
-                    <a href={`/evaluate/${t.id}`} className="btn-evaluate">평가하기</a>
+                    <Link to={`/evaluate/${t.id}`} className="btn-evaluate">평가하기</Link>
                   )}
                 </div>
               ))}

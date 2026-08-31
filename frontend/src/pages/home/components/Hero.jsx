@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useUser } from '@context/UserContext.jsx'
 
 function Hero() {
@@ -18,9 +19,9 @@ function Hero() {
         </p>
         <div className="hero-buttons">
           {loggedIn ? (
-            <a href="/team-members/overview" className="btn-primary">팀원 평가 시작하기 🚀</a>
+            <Link to="/team-members/overview" className="btn-primary">팀원 평가 시작하기 🚀</Link>
           ) : (
-            <a href="/login" className="btn-primary">로그인하고 시작하기 🚀</a>
+            <Link to="/login" className="btn-primary">로그인하고 시작하기 🚀</Link>
           )}
           <a href="#how-it-works" className="btn-secondary">어떻게 쓰는 건데?</a>
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import api from '@api/client'
 
 const EXPIRE_SECONDS = 5 * 60
@@ -109,7 +110,7 @@ function Signup() {
   return (
     <div className="signup-page">
       <div className="signup-card">
-        <a href="/" className="signup-logo">🧑‍💻 WithCoworker</a>
+        <Link to="/" className="signup-logo">🧑‍💻 WithCoworker</Link>
         <h1 className="signup-title">처음 오셨군요 👋</h1>
         <p className="signup-desc">팀원들과 함께 시작해보세요</p>
 
@@ -200,7 +201,7 @@ function Signup() {
         </form>
 
         <p className="signup-footer">
-          이미 계정이 있으신가요? <a href="/login">로그인</a>
+          이미 계정이 있으신가요? <Link to="/login">로그인</Link>
         </p>
       </div>
     </div>

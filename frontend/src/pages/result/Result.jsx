@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
@@ -142,8 +143,8 @@ function Result() {
       <main className="result-main">
 
         <div className="page-nav">
-          <a href="/team-members/overview" className="page-nav-btn">팀원 평가</a>
-          <a href="/result" className="page-nav-btn active">내 평가</a>
+          <Link to="/team-members/overview" className="page-nav-btn">팀원 평가</Link>
+          <Link to="/result" className="page-nav-btn active">내 평가</Link>
         </div>
 
         <div className="result-top">
