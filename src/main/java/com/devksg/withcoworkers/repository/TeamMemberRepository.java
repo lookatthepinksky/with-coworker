@@ -37,6 +37,9 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team WHERE tm.user.id = :userId AND tm.status = com.devksg.withcoworkers.domain.TeamMemberStatus.APPROVED")
     Optional<TeamMember> findByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT tm FROM TeamMember tm JOIN FETCH tm.team WHERE tm.user.id = :userId")
+    Optional<TeamMember> findAnyMembershipByUserId(@Param("userId") Long userId);
+
     @Query("""
             SELECT tm.user.id, tm.user.name,
                    CASE WHEN e IS NOT NULL THEN true ELSE false END

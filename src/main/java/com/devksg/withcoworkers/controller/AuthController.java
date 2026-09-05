@@ -11,6 +11,7 @@ import com.devksg.withcoworkers.repository.AuthProviderRepository;
 import com.devksg.withcoworkers.repository.TeamMemberRepository;
 import com.devksg.withcoworkers.repository.UserRepository;
 import com.devksg.withcoworkers.domain.TeamMemberRole;
+import com.devksg.withcoworkers.domain.TeamMemberStatus;
 import com.devksg.withcoworkers.service.LoginAttemptService;
 import com.devksg.withcoworkers.service.UserSessionService;
 import com.devksg.withcoworkers.service.UserTeamCacheService;
@@ -61,13 +62,15 @@ public class AuthController {
             String token = jwtTokenProvider.generateToken(user.getId());
             userSessionService.save(user.getId(), token);
             setTokenCookie(response, token);
-            var approvedMember = teamMemberRepository.findByUserId(user.getId());
-            Long teamId = approvedMember.map(m -> m.getTeam().getId()).orElse(null);
-            String teamName = approvedMember.map(m -> m.getTeam().getName()).orElse(null);
-            boolean isAdmin = approvedMember.map(m -> m.getRole() == TeamMemberRole.ADMIN).orElse(false);
+            var membership = teamMemberRepository.findAnyMembershipByUserId(user.getId());
+            boolean isApproved = membership.map(m -> m.getStatus() == TeamMemberStatus.APPROVED).orElse(false);
+            Long teamId = isApproved ? membership.get().getTeam().getId() : null;
+            String teamName = isApproved ? membership.get().getTeam().getName() : null;
+            boolean isAdmin = isApproved && membership.get().getRole() == TeamMemberRole.ADMIN;
             userTeamCacheService.saveUserInfo(user.getId(), user.getName(), user.getEmail(), teamId, teamName, isAdmin);
-            boolean isExistingMember = teamMemberRepository.existsByUserId(user.getId());
-            String redirectPath = isExistingMember ? "/team-members/overview" : "/team-select";
+            String redirectPath = membership.isEmpty()                                          ? "/team-select"
+                                : membership.get().getStatus() == TeamMemberStatus.PENDING ? "/team-select?pending=true"
+                                                                                            : "/team-members/overview";
             return ResponseEntity.ok(Map.of("redirectPath", redirectPath));
         } catch (LockedException e) {
             return ResponseEntity.status(429).body(Map.of("message", "로그인 시도 횟수를 초과했습니다. 10분 후 다시 시도해주세요."));
