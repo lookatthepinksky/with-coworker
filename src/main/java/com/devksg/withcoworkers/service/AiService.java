@@ -6,11 +6,11 @@ import com.devksg.withcoworkers.repository.AiUsingCountLogRepository;
 import com.devksg.withcoworkers.repository.AiUsingCountRepository;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
-import com.openai.errors.APIConnectionException;
-import com.openai.errors.AuthenticationException;
 import com.openai.errors.OpenAIException;
+import com.openai.errors.OpenAIIoException;
 import com.openai.errors.RateLimitException;
-import com.openai.models.ChatCompletionCreateParams;
+import com.openai.errors.UnauthorizedException;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +69,7 @@ public class AiService {
     public AiService(@Value("${openai.api.key}") String apiKey) {
         this.openAIClient = OpenAIOkHttpClient.builder()
             .apiKey(apiKey)
-            .connectTimeout(Duration.ofSeconds(5))
-            .readTimeout(Duration.ofSeconds(15))
+            .timeout(Duration.ofSeconds(15))
             .build();
     }
 
@@ -140,11 +139,11 @@ public class AiService {
         } catch (RateLimitException e) {
             // OpenAI 계정 크레딧 소진 (429)
             throw new AiCreditExceededException();
-        } catch (AuthenticationException e) {
+        } catch (UnauthorizedException e) {
             // API 키 인증 실패 (401) - 운영자 확인 필요
             log.error("[AI AUTH ERROR] OpenAI API 키 인증 실패. 키 만료 또는 잘못된 키 확인 필요. status=401");
             throw new AiAuthException();
-        } catch (APIConnectionException e) {
+        } catch (OpenAIIoException e) {
             // 타임아웃 또는 네트워크 단절
             throw new AiTimeoutException();
         } catch (OpenAIException e) {
