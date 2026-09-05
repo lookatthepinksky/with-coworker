@@ -45,6 +45,14 @@ public class UserTeamCacheService {
         }
     }
 
+    public void deleteUserInfo(Long userId) {
+        try {
+            redisTemplate.delete(KEY_PREFIX + userId);
+        } catch (Exception e) {
+            log.warn("[유저캐시삭제실패] userId={}", userId, e);
+        }
+    }
+
     public Optional<Long> getTeamId(Long userId) {
         try {
             Object value = redisTemplate.opsForHash().get(KEY_PREFIX + userId, "teamId");

@@ -85,6 +85,7 @@ public class AuthController {
     public ResponseEntity<?> logout(@AuthenticationPrincipal User user, HttpServletResponse response) {
         if (user != null) {
             userSessionService.invalidate(user.getId());
+            userTeamCacheService.deleteUserInfo(user.getId());
         }
         ResponseCookie cookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
