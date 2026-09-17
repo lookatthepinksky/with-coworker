@@ -40,7 +40,9 @@ public class AiController {
         try {
             Long evaluateeId = Long.parseLong(body.get("evaluateeId"));
             String result = aiService.processCorrection(user.getId(), evaluateeId, comment);
-            boolean rejected = result.contains("업무 관련 평가 내용을 입력해주세요");
+            boolean rejected = result.contains(AiService.REJECTION_UNRELATED)
+                            || result.contains(AiService.REJECTION_INJECTION)
+                            || result.contains(AiService.REJECTION_INSUFFICIENT);
             return ResponseEntity.ok(Map.of("result", result, "rejected", String.valueOf(rejected)));
         } catch (NumberFormatException e) {
             // evaluateeId가 누락됐거나 숫자가 아닌 값이 들어온 경우

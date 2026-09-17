@@ -21,12 +21,28 @@
     <aws.sdk.version>2.28.0</aws.sdk.version>
   </properties>
 
+  <repositories>
+    <!-- JitPack 저장소 추가
+    Langfuse의 공식 Java SDK가 Maven Central이 아니라 JitPack 저장소를 통해 배포되기 때문에-->
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
         <artifactId>bom</artifactId>
         <version>${aws.sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry.instrumentation</groupId>
+        <artifactId>opentelemetry-instrumentation-bom</artifactId>
+        <version>2.28.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -126,7 +142,36 @@
       <artifactId>openai-java</artifactId>
       <version>2.3.0</version>
     </dependency>
+
+    <!-- Spring AI core (ChatModelObservationContext for Langfuse filter) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-core</artifactId>
+      <version>1.0.0-M6</version>
+    </dependency>
+
+    <!-- Actuator + Micrometer -> OTel 브릿지 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-tracing-bridge-otel</artifactId>
+    </dependency>
+    <!-- OTLP exporter -->
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
+    <!-- 자동 설정용 스타터 -->
+    <dependency>
+      <groupId>io.opentelemetry.instrumentation</groupId>
+      <artifactId>opentelemetry-spring-boot-starter</artifactId>
+    </dependency>
+
   </dependencies>
+
 
   <build>
     <plugins>

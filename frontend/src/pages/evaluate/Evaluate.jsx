@@ -42,30 +42,31 @@ function Evaluate() {
         comment,
         evaluateeId: String(id),
       })
-      if (data.error === 'LIMIT_EXCEEDED') {
+      // AI가 거부 메시지를 반환한 경우 (0~3순위 거부, 200 OK로 내려옴)
+      if (data.rejected === 'true') {
+        setCommentWarning(data.result)
+        setAiRemaining((prev) => Math.max(0, (prev ?? 0) - 1))
+        return
+      }
+      // 정상 교정 완료
+      setOriginalComment(comment)
+      setComment(data.result)
+      setCorrected(true)
+      setShowOriginal(true)
+      setAiRemaining((prev) => Math.max(0, (prev ?? 0) - 1))
+    } catch (error) {
+      const errorCode = error.response?.data?.error
+      if (errorCode === 'LIMIT_EXCEEDED') {
         setAiRemaining(0)
         setCommentWarning(`${name}님 평가의 이번 달 AI 교정 횟수를 모두 소진했어요.`)
-        return
-      }
-      if (data.error === 'TOO_LONG') {
+      } else if (errorCode === 'TOO_LONG') {
         setCommentWarning('150자를 초과한 내용은 AI 교정을 사용할 수 없어요.')
-        return
-      }
-      if (data.error === 'SERVICE_UNAVAILABLE') {
-        setCommentWarning('일시적으로 AI 교정을 사용할 수 없어요. 잠시 후 다시 시도해주세요.')
-        return
-      }
-      if (data.error === 'CREDIT_EXCEEDED') {
+      } else if (errorCode === 'CREDIT_EXCEEDED') {
         setCommentWarning('AI 교정 서비스를 현재 사용할 수 없어요. 관리자에게 문의해주세요.')
-        return
+      } else {
+        // TIMEOUT, SERVICE_UNAVAILABLE, 네트워크 오류
+        setCommentWarning('일시적으로 AI 교정을 사용할 수 없어요. 잠시 후 다시 시도해주세요.')
       }
-      else {
-        setOriginalComment(comment)
-        setComment(data.result)
-        setCorrected(true)
-        setShowOriginal(true)
-      }
-      setAiRemaining((prev) => Math.max(0, (prev ?? 0) - 1))
     } finally {
       setCorrecting(false)
     }

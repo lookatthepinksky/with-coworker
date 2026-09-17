@@ -38,6 +38,8 @@ out/
 
 ### Secrets ###
 application-local.properties
+.env
+Langfuse key.txt
 
 ### Node ###
 node_modules/
