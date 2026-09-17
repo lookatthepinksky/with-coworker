@@ -4,21 +4,15 @@ import com.devksg.withcoworkers.domain.AiUsingCount;
 import com.devksg.withcoworkers.domain.AiUsingCountLog;
 import com.devksg.withcoworkers.repository.AiUsingCountLogRepository;
 import com.devksg.withcoworkers.repository.AiUsingCountRepository;
-import com.openai.client.OpenAIClient;
-import com.openai.client.okhttp.OpenAIOkHttpClient;
-import com.openai.errors.OpenAIException;
-import com.openai.errors.OpenAIIoException;
-import com.openai.errors.RateLimitException;
-import com.openai.errors.UnauthorizedException;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -224,19 +218,18 @@ public class AiService {
                           0순위 문구만 출력합니다.
         """;
 
-    private final OpenAIClient openAIClient;
+    private final ChatClient chatClient;
+    private final AiUsingCountRepository aiUsingCountRepository;
+    private final AiUsingCountLogRepository aiUsingCountLogRepository;
 
-    @Autowired
-    private AiUsingCountRepository aiUsingCountRepository;
-
-    @Autowired
-    private AiUsingCountLogRepository aiUsingCountLogRepository;
-
-    public AiService(@Value("${openai.api.key}") String apiKey) {
-        this.openAIClient = OpenAIOkHttpClient.builder()
-            .apiKey(apiKey)
-            .timeout(Duration.ofSeconds(15))
+    public AiService(ChatClient.Builder chatClientBuilder,
+                     AiUsingCountRepository aiUsingCountRepository,
+                     AiUsingCountLogRepository aiUsingCountLogRepository) {
+        this.chatClient = chatClientBuilder
+            .defaultSystem(SYSTEM_PROMPT)
             .build();
+        this.aiUsingCountRepository = aiUsingCountRepository;
+        this.aiUsingCountLogRepository = aiUsingCountLogRepository;
     }
 
     public int getLimit() {
@@ -291,33 +284,28 @@ public class AiService {
 
     private String callOpenAi(String comment) {
         try {
-            var completion = openAIClient.chat().completions().create(
-                ChatCompletionCreateParams.builder()
-                    .model("gpt-4.1-mini")
-                    .addSystemMessage(SYSTEM_PROMPT)
-                    .addUserMessage(comment)
-                    .maxTokens(300)
-                    .build()
-            );
-
-            String content = completion.choices().get(0).message().content().orElse(null);
+            String content = chatClient.prompt()
+                .user(comment)
+                .call()
+                .content();
             if (content == null || content.isBlank()) {
                 throw new AiServiceUnavailableException();
             }
             return content.strip();
         } catch (AiServiceUnavailableException | AiCreditExceededException | AiTimeoutException | AiAuthException e) {
             throw e;
-        } catch (RateLimitException e) {
-            // OpenAI 계정 크레딧 소진 (429)
-            throw new AiCreditExceededException();
-        } catch (UnauthorizedException e) {
-            // API 키 인증 실패 (401) - 운영자 확인 필요
-            log.error("[AI AUTH ERROR] OpenAI API 키 인증 실패. 키 만료 또는 잘못된 키 확인 필요. status=401");
-            throw new AiAuthException();
-        } catch (OpenAIIoException e) {
-            // 타임아웃 또는 네트워크 단절
+        } catch (HttpClientErrorException e) {
+            int status = e.getStatusCode().value();
+            if (status == 429) {
+                throw new AiCreditExceededException();
+            } else if (status == 401 || status == 403) {
+                log.error("[AI AUTH ERROR] OpenAI API 키 인증 실패. 키 만료 또는 잘못된 키 확인 필요. status={}", status);
+                throw new AiAuthException();
+            }
+            throw new AiServiceUnavailableException();
+        } catch (ResourceAccessException e) {
             throw new AiTimeoutException();
-        } catch (OpenAIException e) {
+        } catch (Exception e) {
             throw new AiServiceUnavailableException();
         }
     }

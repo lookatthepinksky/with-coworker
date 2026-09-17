@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
  * Spring AI의 ChatModel이 AI를 호출할 때마다 이 필터가 자동으로 실행되어
  * "어떤 프롬프트를 보냈는지(gen_ai.prompt)"와 "AI가 뭐라고 답했는지(gen_ai.completion)"를
  * 트레이싱 데이터에 끼워 넣는다.
- *
- * 현재 AiService는 raw OpenAI SDK를 사용하므로 이 필터는 동작하지 않는다.
- * Spring AI의 ChatClient로 마이그레이션할 때 활성화된다.
  */
 @Component
 public class ChatModelCompletionContentObservationFilter implements ObservationFilter {
